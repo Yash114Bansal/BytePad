@@ -7,7 +7,7 @@ class UserProfile(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     email = models.EmailField(unique=True)
-    profile_picture = models.URLField()
+    profile_picture = models.URLField(null=True, blank=True)
     is_department_head = models.BooleanField(default=False)
     is_faculty = models.BooleanField(default=False)
     is_student = models.BooleanField(default=False)
@@ -21,6 +21,10 @@ class Course(models.Model):
     semester = models.IntegerField(choices=SEMESTER_CHOICES)
     course_code = models.CharField(max_length=6)
 
+    def __str__(self):
+        return f"{self.name} - {self.branch} - Semester{self.semester}"
+    
+
 class StudentModel(models.Model):
 
     student_number = models.IntegerField(unique=True)
@@ -32,6 +36,10 @@ class StudentModel(models.Model):
     guardian_name = models.CharField(max_length=100)
     guardian_contact_number = models.IntegerField()
     courses = models.ManyToManyField(Course)
+
+    def __str__(self):
+        return self.student_number
+    
 
 class FacultyModel(models.Model):
 
