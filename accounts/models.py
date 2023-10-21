@@ -7,10 +7,10 @@ class UserProfile(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     email = models.EmailField(unique=True)
-
+    profile_picture = models.URLField()
     is_department_head = models.BooleanField(default=False)
     is_faculty = models.BooleanField(default=False)
-    is_student = models.BooleanField(default=True)
+    is_student = models.BooleanField(default=False)
 
     objects = UserManager()
 
@@ -19,7 +19,7 @@ class Course(models.Model):
     name = models.CharField(max_length=100)
     branch = models.CharField(max_length=8, choices=BRANCH_CHOICES)
     semester = models.IntegerField(choices=SEMESTER_CHOICES)
-
+    course_code = models.CharField(max_length=6)
 
 class StudentModel(models.Model):
 
@@ -41,6 +41,6 @@ class FacultyModel(models.Model):
     courses = models.ManyToManyField(Course)
     department = models.CharField(max_length=8, choices=BRANCH_CHOICES)
     is_department_head = models.BooleanField(default=False)
-    
+
     def __str__(self):
         return self.employee_id
