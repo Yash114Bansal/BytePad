@@ -6,8 +6,11 @@ from .choices import *
 class UserProfile(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
+    
+    username = None
     email = models.EmailField(unique=True)
-    profile_picture = models.URLField(null=True, blank=True)
+    profile_picture = models.ImageField(upload_to='profile_pics/', default='default.png')
+
     is_department_head = models.BooleanField(default=False)
     is_faculty = models.BooleanField(default=False)
     is_student = models.BooleanField(default=False)
@@ -26,8 +29,7 @@ class Course(models.Model):
     
 
 class StudentModel(models.Model):
-
-    student_number = models.IntegerField(unique=True)
+    id = models.IntegerField(primary_key=True)
     roll_number = models.IntegerField(unique=True)
     current_semester = models.IntegerField(choices=SEMESTER_CHOICES)
     branch = models.CharField(max_length=8, choices=BRANCH_CHOICES)
@@ -35,15 +37,13 @@ class StudentModel(models.Model):
     date_of_birth = models.DateField()
     guardian_name = models.CharField(max_length=100)
     guardian_contact_number = models.IntegerField()
-    courses = models.ManyToManyField(Course)
 
     def __str__(self):
         return self.student_number
     
 
 class FacultyModel(models.Model):
-
-    employee_id = models.CharField(max_length=10, unique=True)
+    id = models.IntegerField(primary_key=True)
     contact_number = models.IntegerField()
     date_of_birth = models.DateField()
     courses = models.ManyToManyField(Course)
@@ -52,3 +52,16 @@ class FacultyModel(models.Model):
 
     def __str__(self):
         return self.employee_id
+
+class Batch(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    year = models.IntegerField()
+    semester = models.IntegerField(choices=SEMESTER_CHOICES)
+    branch = models.CharField(max_length=8, choices=BRANCH_CHOICES)
+    students = models.ManyToManyField(StudentModel)
+    courses = models.ManyToManyField(Course)
+    faculty = models.ManyToManyField(FacultyModel)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
