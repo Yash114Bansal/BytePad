@@ -39,7 +39,7 @@ class StudentModel(models.Model):
     guardian_contact_number = models.IntegerField()
 
     def __str__(self):
-        return self.student_number
+        return self.roll_number
     
 
 class FacultyModel(models.Model):
