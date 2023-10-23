@@ -42,7 +42,7 @@ class StudentModel(models.Model):
     guardian_contact_number = models.IntegerField()
 
     def __str__(self):
-        return self.roll_number
+        return str(self.roll_number)
 
 
 class FacultyModel(models.Model):
@@ -54,7 +54,7 @@ class FacultyModel(models.Model):
     is_department_head = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 
 class Batch(models.Model):
