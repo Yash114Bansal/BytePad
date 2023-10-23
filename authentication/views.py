@@ -5,6 +5,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
 from .serializers import (
     ResetPasswordSerializer,
     VerifyOTPSerializer,
@@ -22,6 +23,7 @@ class SendMailView(GenericAPIView):
     """
 
     serializer_class = ResetPasswordSerializer
+    throttle_classes = [AnonRateThrottle]
 
     def post(self, request, *args, **kwargs):
 
@@ -68,6 +70,7 @@ class VerifyOTPView(GenericAPIView):
     """
 
     serializer_class = VerifyOTPSerializer
+    throttle_classes = [AnonRateThrottle]
 
     def post(self, request, *args, **kwargs):
 
@@ -118,6 +121,7 @@ class UpdatePasswordView(GenericAPIView):
     """
 
     serializer_class = UpdatePasswordSerializer
+    throttle_classes = [AnonRateThrottle]
 
     def post(self, request, *args, **kwargs):
 
