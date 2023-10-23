@@ -4,7 +4,7 @@ from .courses import courses
 
 
 class Command(BaseCommand):
-    help = 'Create courses from a dictionary'
+    help = "Create courses from a dictionary"
 
     def handle(self, *args, **options):
         for branch, semesters in courses.items():
@@ -16,7 +16,8 @@ class Command(BaseCommand):
                         name=course_name,
                         branch=branch,
                         semester=int(semester.strip("Semester ")),
-                        course_code=course_code
+                        course_code=course_code,
                     )
-                    self.stdout.write(self.style.SUCCESS(
-                        f'Created course: {course_code}'))
+                    self.stdout.write(
+                        self.style.SUCCESS(f"Created course: {course_code}")
+                    )

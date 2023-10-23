@@ -1,5 +1,6 @@
 from django.core.mail import send_mail
 from django.conf import settings
+
 def send_otp(otp, email):
     subject = "Reset Password OTP"
     message = f"""
@@ -18,5 +19,5 @@ The BytePad Team
 """
     from_email = settings.EMAIL_HOST_USER
     recipient_list = [email]
-    
+
     return send_mail(subject, message, from_email, recipient_list)

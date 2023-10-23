@@ -3,13 +3,16 @@ from django.db import models
 from .managers import UserManager
 from .choices import *
 
+
 class UserProfile(AbstractUser):
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
-    
+
     username = None
     email = models.EmailField(unique=True)
-    profile_picture = models.ImageField(upload_to='profile_pics/', default='default.png')
+    profile_picture = models.ImageField(
+        upload_to="profile_pics/", default="default.png"
+    )
 
     is_department_head = models.BooleanField(default=False)
     is_faculty = models.BooleanField(default=False)
@@ -26,7 +29,7 @@ class Course(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.branch} - Semester{self.semester}"
-    
+
 
 class StudentModel(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -40,7 +43,7 @@ class StudentModel(models.Model):
 
     def __str__(self):
         return self.roll_number
-    
+
 
 class FacultyModel(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -51,7 +54,8 @@ class FacultyModel(models.Model):
     is_department_head = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.employee_id
+        return self.id
+
 
 class Batch(models.Model):
     name = models.CharField(max_length=100, unique=True)
