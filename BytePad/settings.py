@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "authentication",
     "accounts",
+    'users',
     "drf_yasg",
 ]
 
