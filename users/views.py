@@ -14,41 +14,45 @@ class UserDetailsView(GenericAPIView):
 
     def get(self, request, *args, **kwargs):
         try:
-            # Get the user using the request.user.id
+            # Getting User With Corresponding ID
             user = UserProfile.objects.get(id=request.user.id)
             
-            # Serialize the user data using the UserSerializer
             serializer = UserSerializer(user)
-
-            # Initialize additional data as an empty dictionary
+            
             additional_data = {}
 
-            # If the user is a faculty, include faculty details
+            # If The User Is A Faculty, Include Faculty Details
             if user.is_faculty:
                 faculty = FacultyModel.objects.get(id=user.id)
                 faculty_serializer = FacultySerializer(faculty)
                 additional_data = faculty_serializer.data
 
-            # If the user is a student, include student details
+            # If The User Is A Student, Include Student Details
             if user.is_student:
                 student = StudentModel.objects.get(id=user.id)
                 student_serializer = StudentSerializer(student)
                 additional_data = student_serializer.data
 
-            # Merge the additional data into the user data
+            # Merge The Additional Data Into The User Data
             response_data = {
                 **serializer.data,
                 **additional_data
             }
+
+            # Remove ID From Response
             response_data.pop("id")
-            # Return the response with a status code of 200 OK
+
+            # Return The Response With A Status Code Of 200
             return Response(response_data, status=status.HTTP_200_OK)
 
+        # If User Profile Does Not Exists
         except UserProfile.DoesNotExist:
             return Response({'message': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # If User Is Faculty And Faculty Details Does Not Exists
         except FacultyModel.DoesNotExist:
             return Response({'message': 'Faculty data not found'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # If User Is Student And Student Details Does Not Exists
         except StudentModel.DoesNotExist:
             return Response({'message': 'Student data not found'}, status=status.HTTP_400_BAD_REQUEST)
