@@ -1,13 +1,13 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.generics import GenericAPIView
+from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAuthenticated
 from accounts.serializers import UserSerializer, StudentSerializer, FacultySerializer
 from accounts.models import UserProfile, StudentModel, FacultyModel
 
 
-class UserDetailsView(GenericAPIView):
+class UserDetailsView(APIView):
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
