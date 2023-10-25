@@ -159,6 +159,8 @@ class UpdatePasswordView(GenericAPIView):
                     {"error": "User Verification Failed"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+            
+            # Checking If PasswordResetToken Is Expired
             if verifyPasswordToken.has_expired():
                 verifyPasswordToken.delete()
 
@@ -166,14 +168,14 @@ class UpdatePasswordView(GenericAPIView):
                     {"error": "Token has expired"}, status=status.HTTP_400_BAD_REQUEST
                 )
 
-            # Checking If User Exits Or Not
+            
             userObject = verifyPasswordToken.user
 
             # Set userPassword to password
             userObject.password = make_password(new_password)
             userObject.save()
 
-            # Removing User From Verified User
+            # Removing User Password Reset Token
             verifyPasswordToken.delete()
 
             return Response(
