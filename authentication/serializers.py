@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-
 class ResetPasswordSerializer(serializers.Serializer):
     mail = serializers.EmailField(required=True)
 
@@ -11,5 +10,5 @@ class VerifyOTPSerializer(serializers.Serializer):
 
 
 class UpdatePasswordSerializer(serializers.Serializer):
-    mail = serializers.EmailField(required=True)
     new_password = serializers.CharField(required=True)
+    token = serializers.CharField(required=True)
