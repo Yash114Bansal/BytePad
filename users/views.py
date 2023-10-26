@@ -15,7 +15,7 @@ class UserDetailsView(APIView):
     def get(self, request, *args, **kwargs):
         try:
             # Getting User With Corresponding ID
-            user = UserProfile.objects.get(id=request.user.id)
+            user = UserProfile.objects.get(email=request.user.email)
             
             serializer = UserSerializer(user)
             
@@ -23,13 +23,13 @@ class UserDetailsView(APIView):
 
             # If The User Is A Faculty, Include Faculty Details
             if user.is_faculty:
-                faculty = FacultyModel.objects.get(id=user.id)
+                faculty = FacultyModel.objects.get(email=user.email)
                 faculty_serializer = FacultySerializer(faculty)
                 additional_data = faculty_serializer.data
 
             # If The User Is A Student, Include Student Details
             if user.is_student:
-                student = StudentModel.objects.get(id=user.id)
+                student = StudentModel.objects.get(email=user.email)
                 student_serializer = StudentSerializer(student)
                 additional_data = student_serializer.data
 
@@ -38,9 +38,6 @@ class UserDetailsView(APIView):
                 **serializer.data,
                 **additional_data
             }
-
-            # Remove ID From Response
-            response_data.pop("id")
 
             # Return The Response With A Status Code Of 200
             return Response(response_data, status=status.HTTP_200_OK)
