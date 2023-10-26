@@ -86,6 +86,10 @@ REST_FRAMEWORK = {
     }
 }
 
+SIMPLE_JWT = {
+    'USER_ID_FIELD': 'email',
+}
+
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {
         "Bearer": {
