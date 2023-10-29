@@ -8,13 +8,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             "email",
             "name",
-            "password",
             "is_department_head",
             "is_faculty",
             "is_student",
         ]
 
-    password = serializers.CharField(write_only=True)
     is_department_head = serializers.BooleanField(required=True)
     is_faculty = serializers.BooleanField(required=True)
     is_student = serializers.BooleanField(required=True)
@@ -27,12 +25,6 @@ class UserSerializer(serializers.ModelSerializer):
             is_student=validated_data["is_student"],
             name = validated_data["name"],
         )
-        password = validated_data["password"]
-        user.set_password(password)
-        user.save()
-
-        print(f"user={user.name},email={user.email},password={password}")
-        send_welcome_email(user=user.name,email=user.email,password=password)
 
         return user
 

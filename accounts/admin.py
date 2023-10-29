@@ -9,6 +9,7 @@ admin.site.register(Batch)
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = ("email", "is_department_head", "is_faculty", "is_student")
+    fields = ("email", "name","profile_picture", "is_department_head", "is_faculty", "is_student")
 
 
 @admin.register(StudentModel)
