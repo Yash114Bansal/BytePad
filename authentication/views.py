@@ -5,14 +5,16 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from rest_framework.throttling import AnonRateThrottle
 from .serializers import (
     ResetPasswordSerializer,
     VerifyOTPSerializer,
     UpdatePasswordSerializer,
 )
-from .models import OTP, AllowPasswordReset
+from .models import OTP, PasswordResetToken
 from .utils import send_otp
 from accounts.models import UserProfile
+from secrets import token_hex as generateToken
 
 
 class SendMailView(GenericAPIView):
@@ -22,6 +24,7 @@ class SendMailView(GenericAPIView):
     """
 
     serializer_class = ResetPasswordSerializer
+    throttle_classes = [AnonRateThrottle]
 
     def post(self, request, *args, **kwargs):
 
@@ -38,8 +41,16 @@ class SendMailView(GenericAPIView):
                 old_otp.delete()
 
             # Generate Random Six-Digit OTP
-            otp = randint(100000, 999999)
+            otp = randint(1000, 9999)
 
+            try:
+                user = UserProfile.objects.get(email=email)
+
+            except UserProfile.DoesNotExist:
+                return Response(
+                    {"error": "Invalid User"}, status=status.HTTP_400_BAD_REQUEST
+                )
+            
             # Send OTP To Provided Mail
             if send_otp(otp, email) == 1:
                 
@@ -68,6 +79,7 @@ class VerifyOTPView(GenericAPIView):
     """
 
     serializer_class = VerifyOTPSerializer
+    throttle_classes = [AnonRateThrottle]
 
     def post(self, request, *args, **kwargs):
 
@@ -96,16 +108,25 @@ class VerifyOTPView(GenericAPIView):
             otp_object.delete()
 
             # Removing Account If It Is Already Present In Verified Account Table
-            old_account = AllowPasswordReset.objects.filter(mail=email)
+            password_reset_token = generateToken(32)
+            expiry_time = timezone.now() + timezone.timedelta(minutes=5)
 
-            if old_account:
-                old_account.delete()
+            try:
+                user = UserProfile.objects.get(email=email)
 
-            # Creating New Object For Verified Account
-            AllowPasswordReset.objects.create(mail=email)
-
+            except:
+                
+                return Response(
+                    {"error": "Invalid User"}, status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            PasswordResetToken.objects.create(user=user,token=password_reset_token,expiry_time=expiry_time)
+            
             return Response(
-                {"message": "OTP verified successfully"}, status=status.HTTP_200_OK
+                {
+                    "message": "OTP verified successfully",
+                    "token" : password_reset_token
+                }, status=status.HTTP_200_OK
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -118,40 +139,44 @@ class UpdatePasswordView(GenericAPIView):
     """
 
     serializer_class = UpdatePasswordSerializer
+    throttle_classes = [AnonRateThrottle]
 
     def post(self, request, *args, **kwargs):
 
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            email = serializer.validated_data["mail"]
+            token = serializer.validated_data["token"]
             new_password = serializer.validated_data["new_password"]
 
             # Checking If User Is Verified Or Not
             try:
-                verifyUserObject = AllowPasswordReset.objects.get(mail=email)
+                verifyPasswordToken = PasswordResetToken.objects.get(token=token)
 
-            except AllowPasswordReset.DoesNotExist:
+            except PasswordResetToken.DoesNotExist:
+
                 return Response(
                     {"error": "User Verification Failed"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+            
+            # Checking If PasswordResetToken Is Expired
+            if verifyPasswordToken.has_expired():
+                verifyPasswordToken.delete()
 
-            # Checking If User Exits Or Not
-            try:
-                userObject = UserProfile.objects.get(email=email)
-
-            except UserProfile.DoesNotExist:
                 return Response(
-                    {"error": "Invalid User"}, status=status.HTTP_400_BAD_REQUEST
+                    {"error": "Token has expired"}, status=status.HTTP_400_BAD_REQUEST
                 )
+
+            
+            userObject = verifyPasswordToken.user
 
             # Set userPassword to password
             userObject.password = make_password(new_password)
             userObject.save()
 
-            # Removing User From Verified User
-            verifyUserObject.delete()
+            # Removing User Password Reset Token
+            verifyPasswordToken.delete()
 
             return Response(
                 {"message": "Password updated successfully"}, status=status.HTTP_200_OK

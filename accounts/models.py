@@ -9,7 +9,9 @@ class UserProfile(AbstractUser):
     REQUIRED_FIELDS = []
 
     username = None
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True,primary_key=True)
+    name = models.CharField(max_length=200,null=True)
+
     profile_picture = models.ImageField(
         upload_to="profile_pics/", default="default.png"
     )
@@ -32,7 +34,7 @@ class Course(models.Model):
 
 
 class StudentModel(models.Model):
-    id = models.IntegerField(primary_key=True)
+    email = models.EmailField(primary_key=True)
     roll_number = models.IntegerField(unique=True)
     current_semester = models.IntegerField(choices=SEMESTER_CHOICES)
     branch = models.CharField(max_length=8, choices=BRANCH_CHOICES)
@@ -46,7 +48,7 @@ class StudentModel(models.Model):
 
 
 class FacultyModel(models.Model):
-    id = models.IntegerField(primary_key=True)
+    email = models.EmailField(primary_key=True)
     contact_number = models.IntegerField()
     date_of_birth = models.DateField()
     courses = models.ManyToManyField(Course)

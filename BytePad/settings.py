@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "authentication",
     "accounts",
+    'users',
     "drf_yasg",
 ]
 
@@ -80,6 +81,13 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    "DEFAULT_THROTTLE_RATES":{
+        'anon' : '5/hour',
+    }
+}
+
+SIMPLE_JWT = {
+    'USER_ID_FIELD': 'email',
 }
 
 SWAGGER_SETTINGS = {

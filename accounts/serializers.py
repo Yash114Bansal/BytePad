@@ -1,20 +1,18 @@
 from rest_framework import serializers
 from .models import UserProfile, StudentModel, FacultyModel
-
+from .utils import send_welcome_email
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
         fields = [
-            "id",
             "email",
-            "password",
+            "name",
             "is_department_head",
             "is_faculty",
             "is_student",
         ]
 
-    password = serializers.CharField(write_only=True)
     is_department_head = serializers.BooleanField(required=True)
     is_faculty = serializers.BooleanField(required=True)
     is_student = serializers.BooleanField(required=True)
@@ -25,9 +23,9 @@ class UserSerializer(serializers.ModelSerializer):
             is_department_head=validated_data["is_department_head"],
             is_faculty=validated_data["is_faculty"],
             is_student=validated_data["is_student"],
+            name = validated_data["name"],
         )
-        user.set_password(validated_data["password"])
-        user.save()
+
         return user
 
 
@@ -35,7 +33,7 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentModel
         fields = [
-            "id",
+            "email",
             "roll_number",
             "current_semester",
             "branch",
@@ -50,7 +48,7 @@ class FacultySerializer(serializers.ModelSerializer):
     class Meta:
         model = FacultyModel
         fields = [
-            "id",
+            "email",
             "contact_number",
             "date_of_birth",
             "courses",

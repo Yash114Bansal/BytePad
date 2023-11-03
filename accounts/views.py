@@ -1,14 +1,14 @@
-from rest_framework import generics
-from .models import UserProfile, StudentModel, FacultyModel
-from .serializers import UserSerializer, StudentSerializer, FacultySerializer
+from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAdminUser
+from .models import UserProfile, StudentModel, FacultyModel
+from .serializers import UserSerializer, StudentSerializer, FacultySerializer
 
 
-class UserListCreateView(generics.ListCreateAPIView, generics.DestroyAPIView):
+class UserViewSet(ModelViewSet):
 
     """
-    Create New User Profile, Admin Access Only
+    User Profiles, Admin Access Only
     """
 
     queryset = UserProfile.objects.all()
@@ -17,10 +17,10 @@ class UserListCreateView(generics.ListCreateAPIView, generics.DestroyAPIView):
     permission_classes = [IsAdminUser]
 
 
-class StudentDetailView(generics.ListCreateAPIView):
+class StudentDetailViewSet(ModelViewSet):
 
     """
-    Enroll New Student, Admin Access Only
+    Student Profiles, Admin Access Only
     """
 
     queryset = StudentModel.objects.all()
@@ -29,10 +29,10 @@ class StudentDetailView(generics.ListCreateAPIView):
     permission_classes = [IsAdminUser]
 
 
-class FacultyDetailView(generics.ListCreateAPIView):
+class FacultyDetailViewSet(ModelViewSet):
 
     """
-    Register New Faculty, Admin Access Only
+    Faculty, Admin Access Only
     """
 
     queryset = FacultyModel.objects.all()
