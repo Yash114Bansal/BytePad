@@ -5,6 +5,8 @@ import cloudinary.api
 import cloudinary.uploader
 from pathlib import Path
 
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -137,3 +139,5 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+
+
