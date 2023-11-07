@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "accounts",
     'users',
     'papers',
+    'details',
     "drf_yasg",
 ]
 

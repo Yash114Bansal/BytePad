@@ -63,10 +63,14 @@ class Batch(models.Model):
     year = models.IntegerField()
     semester = models.IntegerField(choices=SEMESTER_CHOICES)
     branch = models.CharField(max_length=8, choices=BRANCH_CHOICES)
-    students = models.ManyToManyField(StudentModel)
-    courses = models.ManyToManyField(Course)
-    faculty = models.ManyToManyField(FacultyModel)
+    students = models.ManyToManyField(StudentModel)    
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.name
+    
+    
+class BatchCourseFacultyAssignment(models.Model):
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    faculty = models.ForeignKey(FacultyModel, on_delete=models.CASCADE)
