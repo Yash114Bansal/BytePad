@@ -1,6 +1,9 @@
 import os
-from pathlib import Path
 import dj_database_url
+import cloudinary
+import cloudinary.api
+import cloudinary.uploader
+from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -24,6 +27,7 @@ INSTALLED_APPS = [
     "authentication",
     "accounts",
     'users',
+    'papers',
     "drf_yasg",
 ]
 
@@ -83,7 +87,9 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_THROTTLE_RATES":{
         'anon' : '5/hour',
-    }
+    },
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
 }
 
 SIMPLE_JWT = {
@@ -102,6 +108,17 @@ SWAGGER_SETTINGS = {
     "JSON_EDITOR": True,
 }
 
+cloudinary.config(
+    cloud_name=os.environ.get("CLOUD_NAME"),
+    api_key=os.environ.get("API_KEY"),
+    api_secret=os.environ.get("API_SECRET")
+
+)
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+
+
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
@@ -111,9 +128,6 @@ USE_TZ = True
 LOGIN_URL = "/admin/"
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

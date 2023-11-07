@@ -19,4 +19,4 @@ class StudentModelAdmin(admin.ModelAdmin):
 
 @admin.register(FacultyModel)
 class FacultyModelAdmin(admin.ModelAdmin):
-    list_display = ("email", "contact_number", "department", "is_department_head")
+    list_display = ("email", "contact_number", "department")
