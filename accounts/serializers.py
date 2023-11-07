@@ -53,5 +53,4 @@ class FacultySerializer(serializers.ModelSerializer):
             "date_of_birth",
             "courses",
             "department",
-            "is_department_head",
         ]

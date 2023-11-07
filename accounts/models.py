@@ -53,10 +53,9 @@ class FacultyModel(models.Model):
     date_of_birth = models.DateField()
     courses = models.ManyToManyField(Course)
     department = models.CharField(max_length=8, choices=BRANCH_CHOICES)
-    is_department_head = models.BooleanField(default=False)
 
     def __str__(self):
-        return str(self.id)
+        return str(self.email)
 
 
 class Batch(models.Model):
