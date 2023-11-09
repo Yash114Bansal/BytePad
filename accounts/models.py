@@ -25,6 +25,7 @@ class UserProfile(AbstractUser):
 
 class Course(models.Model):
     name = models.CharField(max_length=100)
+    #DATABASE 
     branch = models.CharField(max_length=8, choices=BRANCH_CHOICES)
     semester = models.IntegerField(choices=SEMESTER_CHOICES)
     course_code = models.CharField(max_length=6)
@@ -34,7 +35,8 @@ class Course(models.Model):
 
 
 class StudentModel(models.Model):
-    email = models.EmailField(primary_key=True)
+
+    user = models.ForeignKey(UserProfile,on_delete=models.CASCADE)
     roll_number = models.IntegerField(unique=True)
     current_semester = models.IntegerField(choices=SEMESTER_CHOICES)
     branch = models.CharField(max_length=8, choices=BRANCH_CHOICES)
@@ -48,7 +50,7 @@ class StudentModel(models.Model):
 
 
 class FacultyModel(models.Model):
-    email = models.EmailField(primary_key=True)
+    user = models.ForeignKey(UserProfile,on_delete=models.CASCADE)
     contact_number = models.IntegerField()
     date_of_birth = models.DateField()
     courses = models.ManyToManyField(Course)

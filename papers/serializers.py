@@ -4,14 +4,14 @@ from .models import SamplePaper, Course
 class SamplePaperUploadSerializer(serializers.ModelSerializer):
 
     course_code = serializers.CharField(required=False)
-    id = serializers.SerializerMethodField()
+    # id = serializers.SerializerMethodField()
 
     class Meta:
         model = SamplePaper
         fields = ['id','title', 'file', 'year', 'semester', 'course_code']
 
-    def get_id(self, obj):
-        return obj.id
+    # def get_id(self, obj):
+    #     return obj.id
 
     def create(self, validated_data):
         course_code = validated_data.pop('course_code', None)

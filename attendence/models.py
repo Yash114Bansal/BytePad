@@ -7,12 +7,11 @@ from accounts.models import (
 class Attendance(models.Model):
     student = models.ForeignKey(StudentModel, on_delete=models.CASCADE)
     date = models.DateField()
-    status = models.CharField(max_length=10, choices=(('present', 'Present'),
-    ('absent', 'Absent'),))
+    present = models.BooleanField(default=False)
 
 
 class AttendanceSheet(models.Model):
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    date = models.DateField()
+    date = models.DateField(unique=True)
     attendance_records = models.ManyToManyField(Attendance)

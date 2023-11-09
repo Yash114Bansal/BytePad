@@ -37,9 +37,10 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         if query:
 
             title_similarity = TrigramSimilarity(Cast('title', output_field=TextField()), query)
-            overall_similarity = title_similarity 
-            queryset = SamplePaper.objects.annotate(similarity=overall_similarity).filter(similarity__gt=0.3).order_by('-similarity')
-    
+            print(title_similarity)
+            queryset = SamplePaper.objects.annotate(similarity=title_similarity).order_by('-similarity')
+            for item in queryset:
+                print(item.similarity)
         else:
             queryset = super().get_queryset()
 

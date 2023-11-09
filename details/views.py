@@ -12,7 +12,7 @@ class BatchDetailView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsFaculty]
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         user_email = request.user.email
 
         active_batches_with_faculty = Batch.objects.filter(is_active=True).filter(
@@ -38,6 +38,7 @@ class StudentListView(APIView):
 
         serialized_students = []
 
+        # Remove
         students = batch.students.all()
         for student in students:
             user = UserProfile.objects.get(email = student.email)

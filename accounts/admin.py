@@ -14,9 +14,9 @@ class UserProfileAdmin(admin.ModelAdmin):
 
 @admin.register(StudentModel)
 class StudentModelAdmin(admin.ModelAdmin):
-    list_display = ("email", "roll_number", "current_semester", "branch", "contact_number")
+    list_display = ("user", "roll_number", "current_semester", "branch", "contact_number")
 
 
 @admin.register(FacultyModel)
 class FacultyModelAdmin(admin.ModelAdmin):
-    list_display = ("email", "contact_number", "department")
+    list_display = ("user", "contact_number", "department")
