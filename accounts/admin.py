@@ -1,10 +1,12 @@
 from django.contrib import admin
-from .models import Course, StudentModel, FacultyModel, UserProfile, Batch,BatchCourseFacultyAssignment
+from .models import Course, StudentModel, FacultyModel, UserProfile, Batch,BatchCourseFacultyAssignment, Semester, Branch
 
 # Register your models here.
 admin.site.register(Course)
 admin.site.register(Batch)
 admin.site.register(BatchCourseFacultyAssignment)
+admin.site.register(Semester)
+admin.site.register(Branch)
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):

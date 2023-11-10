@@ -6,6 +6,9 @@ from accounts.permissions import IsFaculty
 from django.db.models import Q
 from .serializers import BatchDetailSerializer, StudentSerializer
 from rest_framework.response import Response
+from accounts.models import UserProfile, StudentModel, FacultyModel
+from accounts.serializers import UserSerializer, StudentSerializer, FacultySerializer
+from rest_framework.permissions import IsAuthenticated
 
 class BatchDetailView(APIView):
 
@@ -16,7 +19,7 @@ class BatchDetailView(APIView):
         user_email = request.user.email
 
         active_batches_with_faculty = Batch.objects.filter(is_active=True).filter(
-            Q(batchcoursefacultyassignment__faculty__email=user_email)
+            Q(batchcoursefacultyassignment__faculty__user=user_email)
         )
 
         if active_batches_with_faculty:
@@ -39,7 +42,54 @@ class StudentListView(APIView):
         batch_students = batch.students.all()
         serializer = StudentSerializer(batch_students,many=True)
 
-        if serializer.is_valid():
+        if serializer.is_valid:
             return Response(serializer.data,status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class UserDetailsView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            # Getting User With Corresponding ID
+            user = UserProfile.objects.get(email=request.user.email)
+            
+            serializer = UserSerializer(user)
+            
+            additional_data = {}
+
+            # If The User Is A Faculty, Include Faculty Details
+            if user.is_faculty:
+                faculty = FacultyModel.objects.get(user=user.email)
+                faculty_serializer = FacultySerializer(faculty)
+                additional_data = faculty_serializer.data
+
+            # If The User Is A Student, Include Student Details
+            if user.is_student:
+                student = StudentModel.objects.get(user=user.email)
+                student_serializer = StudentSerializer(student)
+                additional_data = student_serializer.data
+
+            # Merge The Additional Data Into The User Data
+            response_data = {
+                **serializer.data,
+                **additional_data
+            }
+
+            # Return The Response With A Status Code Of 200
+            return Response(response_data, status=status.HTTP_200_OK)
+
+        # If User Profile Does Not Exists
+        except UserProfile.DoesNotExist:
+            return Response({'message': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # If User Is Faculty And Faculty Details Does Not Exists
+        except FacultyModel.DoesNotExist:
+            return Response({'message': 'Faculty data not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # If User Is Student And Student Details Does Not Exists
+        except StudentModel.DoesNotExist:
+            return Response({'message': 'Student data not found'}, status=status.HTTP_400_BAD_REQUEST)

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import UserProfile, StudentModel, FacultyModel
-from .utils import send_welcome_email
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -33,7 +33,6 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentModel
         fields = [
-            "user",
             "roll_number",
             "current_semester",
             "branch",
@@ -48,9 +47,7 @@ class FacultySerializer(serializers.ModelSerializer):
     class Meta:
         model = FacultyModel
         fields = [
-            "user",
             "contact_number",
             "date_of_birth",
-            "courses",
             "department",
         ]

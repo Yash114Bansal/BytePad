@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     "rest_framework",
     "authentication",
     "accounts",
-    'users',
     'papers',
     'details',
     'attendence',
