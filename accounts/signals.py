@@ -7,7 +7,7 @@ from . models import UserProfile
 
 @receiver(post_save, sender=UserProfile)
 def user_added(sender, instance, created, **kwargs):
-    if created:
+    if created and not instance.is_staff:
         # Code to execute when a user is added through the admin panel
         user = UserProfile.objects.get(email=instance.email)
         user.set_password(f"{instance.name}@123")

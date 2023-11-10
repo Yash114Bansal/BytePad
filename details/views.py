@@ -1,11 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework import status
 from accounts.models import Batch
 from accounts.permissions import IsFaculty
 from django.db.models import Q
-from .serializers import BatchDetailSerializer
+from .serializers import BatchDetailSerializer, StudentSerializer
 from rest_framework.response import Response
-from accounts.models import UserProfile
 
 class BatchDetailView(APIView):
 
@@ -36,15 +36,10 @@ class StudentListView(APIView):
         except Batch.DoesNotExist:
             return Response({"message": "Batch not found"}, status=404)
 
-        serialized_students = []
+        batch_students = batch.students.all()
+        serializer = StudentSerializer(batch_students,many=True)
 
-        # Remove
-        students = batch.students.all()
-        for student in students:
-            user = UserProfile.objects.get(email = student.email)
-            serialized_students.append({
-                "name": user.name,
-                "roll_number": student.roll_number,
-            })
-
-        return Response(serialized_students)
+        if serializer.is_valid():
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

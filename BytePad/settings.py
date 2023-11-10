@@ -9,7 +9,8 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+# SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = """django-insecure-0ub2%@#kc%kri207d_ir2fr#1)my^p%x13)i*#d_7*x9!s22!0"""
 DATABASE = os.environ.get("DATABASE")
 
 DEBUG = True
@@ -66,14 +67,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "BytePad.wsgi.application"
 
-DATABASES = {"default": dj_database_url.parse(DATABASE)}
+# DATABASES = {"default": dj_database_url.parse(DATABASE)}
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 AUTH_PASSWORD_VALIDATORS = [
     {

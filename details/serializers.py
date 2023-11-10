@@ -7,7 +7,11 @@ class BatchDetailSerializer(serializers.ModelSerializer):
         model = Batch
         fields = ["id","name","year","semester","branch"]
 
+
 class StudentSerializer(serializers.ModelSerializer):
+    
+    user_name = serializers.CharField(source='user.name', read_only=True)
+
     class Meta:
         model = StudentModel
-        fields = ['roll_number']
+        fields = ['user_name', 'roll_number', 'current_semester', 'branch', 'contact_number', 'date_of_birth', 'guardian_name', 'guardian_contact_number']

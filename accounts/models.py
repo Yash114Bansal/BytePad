@@ -40,10 +40,10 @@ class StudentModel(models.Model):
     roll_number = models.IntegerField(unique=True)
     current_semester = models.IntegerField(choices=SEMESTER_CHOICES)
     branch = models.CharField(max_length=8, choices=BRANCH_CHOICES)
-    contact_number = models.IntegerField()
+    contact_number = models.BigIntegerField()
     date_of_birth = models.DateField()
     guardian_name = models.CharField(max_length=100)
-    guardian_contact_number = models.IntegerField()
+    guardian_contact_number = models.BigIntegerField()
 
     def __str__(self):
         return str(self.roll_number)
@@ -51,7 +51,7 @@ class StudentModel(models.Model):
 
 class FacultyModel(models.Model):
     user = models.ForeignKey(UserProfile,on_delete=models.CASCADE)
-    contact_number = models.IntegerField()
+    contact_number = models.BigIntegerField()
     date_of_birth = models.DateField()
     courses = models.ManyToManyField(Course)
     department = models.CharField(max_length=8, choices=BRANCH_CHOICES)
