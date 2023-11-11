@@ -33,6 +33,7 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentModel
         fields = [
+            'user',
             "roll_number",
             "current_semester",
             "branch",
@@ -47,6 +48,7 @@ class FacultySerializer(serializers.ModelSerializer):
     class Meta:
         model = FacultyModel
         fields = [
+            'user',
             "contact_number",
             "date_of_birth",
             "department",
