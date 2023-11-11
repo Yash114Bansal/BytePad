@@ -7,7 +7,7 @@ from django.db.models.functions import Cast
 from django.db.models import TextField
 from .models import SamplePaper
 from .serializers import SamplePaperSerializer
-from .permissions import IsHODOrReadOnly
+from accounts.permissions import IsHODOrReadOnly
 
 class SamplePaperViewSet(viewsets.ModelViewSet):
     """
