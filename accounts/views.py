@@ -1,6 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import IsAdminUser
+
 from .models import UserProfile, StudentModel, FacultyModel
 from .serializers import UserSerializer, StudentSerializer, FacultySerializer
 
