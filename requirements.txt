@@ -18,3 +18,4 @@ gunicorn
 whitenoise
 cloudinary
 django-cloudinary-storage
+django-import-export
