@@ -5,12 +5,31 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from accounts.models import Batch, UserProfile, StudentModel, FacultyModel, Semester, Course, Branch
-from accounts.permissions import IsFaculty,IsAdminOrReadOnly
+from accounts.permissions import IsFaculty, IsAdminOrReadOnly
 from accounts.serializers import UserSerializer, StudentSerializer, FacultySerializer
-from .serializers import BatchDetailSerializer, StudentSerializer,  CourseSerializer,SemeterSerializer,BranchSerializer
+from accounts.models import (
+    Batch,
+    UserProfile,
+    StudentModel,
+    FacultyModel,
+    Semester,
+    Course,
+    Branch,
+)
+from .serializers import (
+    BatchDetailSerializer,
+    StudentSerializer,
+    CourseSerializer,
+    SemeterSerializer,
+    BranchSerializer,
+)
+
 
 class BatchDetailView(APIView):
+
+    """
+    API endpoint for Getting Batches Of Faculty
+    """
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsFaculty]
@@ -33,6 +52,12 @@ class BatchDetailView(APIView):
 
 
 class StudentListView(APIView):
+
+    """
+    API Endpoint To Get List Of Students in a Batch
+    *Requires Batch ID
+    """
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsFaculty]
 
@@ -52,6 +77,10 @@ class StudentListView(APIView):
 
 
 class UserDetailsView(APIView):
+
+    """
+    API Endpoint For Getting Details of User
+    """
 
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
@@ -103,19 +132,40 @@ class UserDetailsView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+
 class SemesterViewSet(ModelViewSet):
+
+    """
+    API Endpoint For Getting Details Of Semester
+    (Only Admin Can Update)
+    """
+
     queryset = Semester.objects.all()
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAdminOrReadOnly]
     serializer_class = SemeterSerializer
 
+
 class BranchViewSet(ModelViewSet):
+
+    """
+    API Endpoint For Getting Details Of Branches
+    (Only Admin Can Update)
+    """
+
     queryset = Branch.objects.all()
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAdminOrReadOnly]
     serializer_class = BranchSerializer
 
+
 class CourseViewSet(ModelViewSet):
+
+    """
+    API Endpoint For Getting Details Of Courses
+    (Only Admin Can Update)
+    """
+
     queryset = Course.objects.all()
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAdminOrReadOnly]

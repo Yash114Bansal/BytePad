@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "papers",
     "details",
     "attendence",
+    "import_export",
     "drf_yasg",
 ]
 
