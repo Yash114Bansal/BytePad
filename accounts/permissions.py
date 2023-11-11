@@ -2,13 +2,29 @@ from rest_framework import permissions
 
 class IsFaculty(permissions.BasePermission):
     def has_permission(self, request, view):
+        return request.user.is_authenticated and (request.user.is_faculty or request.user.is_staff)
+    
 
-        user = request.user
+class IsAdminOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and (
+            request.user.is_staff or request.method in permissions.SAFE_METHODS
+        )
 
-        if not user.is_authenticated:
-            return False
-        
-        if user.is_faculty:
-            return True
+class IsFacultyOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and (
+            request.user.is_faculty or request.user.is_staff or request.method in permissions.SAFE_METHODS
+        )
 
-        return False
+
+class IsHODOrReadOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and (
+            request.user.is_department_head or request.user.is_staff or request.method in permissions.SAFE_METHODS
+        )
+
+
+class IsStudent(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and (request.user.is_student or request.user.is_staff)

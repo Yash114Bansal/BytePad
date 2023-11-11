@@ -4,7 +4,7 @@ import cloudinary
 import cloudinary.api
 import cloudinary.uploader
 from pathlib import Path
-
+from datetime import timedelta
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,9 +28,10 @@ INSTALLED_APPS = [
     "rest_framework",
     "authentication",
     "accounts",
-    'users',
-    'papers',
-    'details',
+    "papers",
+    "details",
+    "attendence",
+    "import_export",
     "drf_yasg",
 ]
 
@@ -65,7 +66,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "BytePad.wsgi.application"
 
-DATABASES = {"default": dj_database_url.parse(DATABASE)}
+DATABASES = {
+    "default": dj_database_url.parse(DATABASE)
+}
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -88,15 +92,18 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_THROTTLE_RATES":{
-        'anon' : '5/hour',
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "5/hour",
     },
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
 }
 
 SIMPLE_JWT = {
-    'USER_ID_FIELD': 'email',
+    "USER_ID_FIELD": "email",
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=30),
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=30),
 }
 
 SWAGGER_SETTINGS = {
@@ -114,16 +121,15 @@ SWAGGER_SETTINGS = {
 cloudinary.config(
     cloud_name=os.environ.get("CLOUD_NAME"),
     api_key=os.environ.get("API_KEY"),
-    api_secret=os.environ.get("API_SECRET")
-
+    api_secret=os.environ.get("API_SECRET"),
 )
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+STATICFILES_STORAGE = "cloudinary_storage.storage.StaticHashedCloudinaryStorage"
 
 
 LANGUAGE_CODE = "en-us"
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Kolkata"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
@@ -140,5 +146,3 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
-

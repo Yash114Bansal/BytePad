@@ -1,7 +1,8 @@
 from django.core.mail import send_mail
 from django.conf import settings
 
-def send_welcome_email(user,email, password):
+
+def send_welcome_email(user, email, password):
     subject = "Welcome to BytePad!"
     message = f"""
 Dear {user},
