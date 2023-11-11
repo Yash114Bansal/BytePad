@@ -16,4 +16,6 @@ typing_extensions
 uritemplate==4.1.1
 gunicorn
 whitenoise
+cloudinary
+django-cloudinary-storage
 django-import-export
