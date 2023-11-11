@@ -1,14 +1,13 @@
+from django.db.models import Q
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from rest_framework import status
-from accounts.models import Batch
+from accounts.models import Batch, UserProfile, StudentModel, FacultyModel
 from accounts.permissions import IsFaculty
-from django.db.models import Q
-from .serializers import BatchDetailSerializer, StudentSerializer
-from rest_framework.response import Response
-from accounts.models import UserProfile, StudentModel, FacultyModel
 from accounts.serializers import UserSerializer, StudentSerializer, FacultySerializer
-from rest_framework.permissions import IsAuthenticated
+from .serializers import BatchDetailSerializer, StudentSerializer
 
 class BatchDetailView(APIView):
 
@@ -23,11 +22,14 @@ class BatchDetailView(APIView):
         )
 
         if active_batches_with_faculty:
-            serializer = BatchDetailSerializer(active_batches_with_faculty, many=True)   
+            serializer = BatchDetailSerializer(active_batches_with_faculty, many=True)
             return Response(serializer.data)
-        
+
         else:
-            return Response({'message': 'No active batches with faculty found.'}, status=404)
+            return Response(
+                {"message": "No active batches with faculty found."}, status=404
+            )
+
 
 class StudentListView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -40,12 +42,13 @@ class StudentListView(APIView):
             return Response({"message": "Batch not found"}, status=404)
 
         batch_students = batch.students.all()
-        serializer = StudentSerializer(batch_students,many=True)
+        serializer = StudentSerializer(batch_students, many=True)
 
         if serializer.is_valid:
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserDetailsView(APIView):
 
@@ -56,9 +59,9 @@ class UserDetailsView(APIView):
         try:
             # Getting User With Corresponding ID
             user = UserProfile.objects.get(email=request.user.email)
-            
+
             serializer = UserSerializer(user)
-            
+
             additional_data = {}
 
             # If The User Is A Faculty, Include Faculty Details
@@ -74,22 +77,27 @@ class UserDetailsView(APIView):
                 additional_data = student_serializer.data
 
             # Merge The Additional Data Into The User Data
-            response_data = {
-                **serializer.data,
-                **additional_data
-            }
+            response_data = {**serializer.data, **additional_data}
 
             # Return The Response With A Status Code Of 200
             return Response(response_data, status=status.HTTP_200_OK)
 
         # If User Profile Does Not Exists
         except UserProfile.DoesNotExist:
-            return Response({'message': 'User not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "User not found"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         # If User Is Faculty And Faculty Details Does Not Exists
         except FacultyModel.DoesNotExist:
-            return Response({'message': 'Faculty data not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "Faculty data not found"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # If User Is Student And Student Details Does Not Exists
         except StudentModel.DoesNotExist:
-            return Response({'message': 'Student data not found'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"message": "Student data not found"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )

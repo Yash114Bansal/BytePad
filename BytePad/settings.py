@@ -6,11 +6,9 @@ import cloudinary.uploader
 from pathlib import Path
 
 
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECRET_KEY = os.environ.get("SECRET_KEY")
-SECRET_KEY = """django-insecure-0ub2%@#kc%kri207d_ir2fr#1)my^p%x13)i*#d_7*x9!s22!0"""
+SECRET_KEY = os.environ.get("SECRET_KEY")
 DATABASE = os.environ.get("DATABASE")
 
 DEBUG = True
@@ -29,9 +27,9 @@ INSTALLED_APPS = [
     "rest_framework",
     "authentication",
     "accounts",
-    'papers',
-    'details',
-    'attendence',
+    "papers",
+    "details",
+    "attendence",
     "drf_yasg",
 ]
 
@@ -66,14 +64,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "BytePad.wsgi.application"
 
-# DATABASES = {"default": dj_database_url.parse(DATABASE)}
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.parse(DATABASE)
 }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -96,15 +90,15 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_THROTTLE_RATES":{
-        'anon' : '5/hour',
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "5/hour",
     },
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
+    "PAGE_SIZE": 10,
 }
 
 SIMPLE_JWT = {
-    'USER_ID_FIELD': 'email',
+    "USER_ID_FIELD": "email",
 }
 
 SWAGGER_SETTINGS = {
@@ -122,12 +116,11 @@ SWAGGER_SETTINGS = {
 cloudinary.config(
     cloud_name=os.environ.get("CLOUD_NAME"),
     api_key=os.environ.get("API_KEY"),
-    api_secret=os.environ.get("API_SECRET")
-
+    api_secret=os.environ.get("API_SECRET"),
 )
 
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+STATICFILES_STORAGE = "cloudinary_storage.storage.StaticHashedCloudinaryStorage"
 
 
 LANGUAGE_CODE = "en-us"
@@ -148,5 +141,3 @@ EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-
-

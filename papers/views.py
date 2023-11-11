@@ -9,9 +9,7 @@ from .models import SamplePaper
 from .serializers import SamplePaperSerializer
 from .permissions import IsHODOrReadOnly
 
-
 class SamplePaperViewSet(viewsets.ModelViewSet):
-
     """
     API endpoint for uploading sample papers.
     """
@@ -22,33 +20,31 @@ class SamplePaperViewSet(viewsets.ModelViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsHODOrReadOnly]
     pagination_class = PageNumberPagination
+    SIMILARITY_THRESHOLD = 0.1
 
     def get_queryset(self):
-
         """
         Filtering Results
         """
 
         query = self.request.query_params.get('search')
-        year_param = self.request.query_params.get('year')
-        semester_param = self.request.query_params.get('semester')
-        course_code_param = self.request.query_params.get('course_code')
+        year = self.request.query_params.get('year')
+        semester = self.request.query_params.get('semester')
+        course_code = self.request.query_params.get('course_code')
 
         if query:
-
             title_similarity = TrigramSimilarity(Cast('title', output_field=TextField()), query)
-            queryset = SamplePaper.objects.annotate(similarity=title_similarity).filter(similarity__gt=0.3).order_by('-similarity')
-            
+            queryset = SamplePaper.objects.annotate(similarity=title_similarity).filter(similarity__gt=self.SIMILARITY_THRESHOLD).order_by('-similarity')
         else:
             queryset = super().get_queryset()
 
-        if year_param:
-            queryset = queryset.filter(year=year_param)
+        if year:
+            queryset = queryset.filter(year=year)
 
-        if semester_param:
-            queryset = queryset.filter(semester=semester_param)
-            
-        if course_code_param:
-            queryset = queryset.filter(courses__course_code=course_code_param)
+        if semester:
+            queryset = queryset.filter(semester=semester)
+
+        if course_code:
+            queryset = queryset.filter(courses__course_code=course_code)
 
         return queryset

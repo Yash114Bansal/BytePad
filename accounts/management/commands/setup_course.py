@@ -10,8 +10,6 @@ class Command(BaseCommand):
         for course in courses:
             name = course["Course Name"]
             course_code = course["Course Code"]
-            Course.objects.create(name=name ,course_code=course_code)
+            Course.objects.create(name=name, course_code=course_code)
 
-            self.stdout.write(
-                        self.style.SUCCESS(f"Created Course: {name}")
-                    )
+            self.stdout.write(self.style.SUCCESS(f"Created Course: {name}"))

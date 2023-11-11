@@ -8,8 +8,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for semester in semesters:
-            Semester.objects.create(name=semester[1],semester = semester[0])
+            Semester.objects.create(name=semester[1], semester=semester[0])
 
-            self.stdout.write(
-                        self.style.SUCCESS(f"Created Semester: {semester[1]}")
-                    )
+            self.stdout.write(self.style.SUCCESS(f"Created Semester: {semester[1]}"))

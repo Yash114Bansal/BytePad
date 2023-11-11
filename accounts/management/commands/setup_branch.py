@@ -8,8 +8,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for branch in branches:
-            Branch.objects.create(name=branch[0],full_name = branch[1])
+            Branch.objects.create(name=branch[0], full_name=branch[1])
 
-            self.stdout.write(
-                        self.style.SUCCESS(f"Created Branch: {branch[1]}")
-                    )
+            self.stdout.write(self.style.SUCCESS(f"Created Branch: {branch[1]}"))

@@ -3,6 +3,10 @@ from .models import UserProfile, StudentModel, FacultyModel
 
 
 class UserSerializer(serializers.ModelSerializer):
+    is_department_head = serializers.BooleanField(required=True)
+    is_faculty = serializers.BooleanField(required=True)
+    is_student = serializers.BooleanField(required=True)
+
     class Meta:
         model = UserProfile
         fields = [
@@ -13,17 +17,13 @@ class UserSerializer(serializers.ModelSerializer):
             "is_student",
         ]
 
-    is_department_head = serializers.BooleanField(required=True)
-    is_faculty = serializers.BooleanField(required=True)
-    is_student = serializers.BooleanField(required=True)
-
     def create(self, validated_data):
         user = UserProfile.objects.create(
             email=validated_data["email"],
             is_department_head=validated_data["is_department_head"],
             is_faculty=validated_data["is_faculty"],
             is_student=validated_data["is_student"],
-            name = validated_data["name"],
+            name=validated_data["name"],
         )
 
         return user
