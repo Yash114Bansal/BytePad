@@ -1,12 +1,13 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.generics import GenericAPIView,DestroyAPIView,CreateAPIView
+from rest_framework.generics import GenericAPIView,ListAPIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from accounts.models import Batch
 from accounts.permissions import IsFaculty
 
 from .models import Attendance, AttendanceSheet
-from .serializers import AttendanceSerializer, AttendanceSheetSerializer
+from .serializers import AttendanceSerializer, AttendanceSheetSerializer,FacultyBatchAttendanceSerializer
 
 
 class AttendenceSheetCreateView(GenericAPIView):
@@ -37,3 +38,25 @@ class AttendenceSheetDeleteView(GenericAPIView):
 
         attendance_sheet.delete()
         return Response({"message": "Attendance sheet deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+
+class FacultyBatchAttendanceView(ListAPIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsFaculty]
+    serializer_class = FacultyBatchAttendanceSerializer
+
+    def get_queryset(self):
+        return AttendanceSheet.objects.all()
+
+    def list(self, request, *args, **kwargs):
+        batch_id = self.kwargs.get('batch_id')
+
+        try:
+            batch = Batch.objects.get(pk=batch_id)
+            attendance_sheets = AttendanceSheet.objects.filter(
+                assignment__batch=batch
+            )
+        except Batch.DoesNotExist:
+            return Response({"message":"batch does not exists"},status=status.HTTP_404_NOT_FOUND)
+
+        serializer = self.get_serializer(attendance_sheets, many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)

@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from accounts.models import FacultyModel, BatchCourseFacultyAssignment
+from accounts.models import FacultyModel, BatchCourseFacultyAssignment,Batch
 from .models import Attendance, AttendanceSheet
 
-
 class AttendanceSerializer(serializers.ModelSerializer):
+    roll_number = serializers.ReadOnlyField(source='student.roll_number')
     class Meta:
         model = Attendance
-        fields = "__all__"
+        fields = ["roll_number","date","present"]
 
 
 class AttendanceSheetSerializer(serializers.Serializer):
@@ -58,3 +58,18 @@ class AttendanceSheetSerializer(serializers.Serializer):
         attendance_sheet.attendance_records.set(created_attendance_records)
         
         return attendance_sheet
+
+class BatchAttendanceSerializer(serializers.Serializer):
+    batchID = serializers.IntegerField()
+    date = serializers.DateField()
+
+    def validate_batchID(self, value):
+        try:
+            batch = Batch.objects.get(pk=value)
+        except Batch.DoesNotExist:
+            raise serializers.ValidationError("Batch not found.")
+        return batch
+
+class FacultyBatchAttendanceSerializer(serializers.Serializer):
+    batchID = serializers.IntegerField(source='assignment.batch.id')
+    attendance_records = AttendanceSerializer(many=True)
