@@ -1,6 +1,5 @@
 from django.db import models
 from accounts.models import Course
-# from .managers import SamplePaperManager
 
 class SamplePaper(models.Model):
     title = models.CharField(max_length=100)
@@ -9,7 +8,10 @@ class SamplePaper(models.Model):
     semester = models.IntegerField()
     courses = models.ManyToManyField(Course)
     
-    # objects = SamplePaperManager()
-
     def __str__(self):
         return self.title
+
+class SamplePaperSolution(models.Model):
+    
+    paper = models.ForeignKey(SamplePaper,on_delete=models.CASCADE)
+    file = models.FileField(upload_to='uploads/')

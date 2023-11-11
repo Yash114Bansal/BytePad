@@ -6,21 +6,21 @@ from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models.functions import Cast
 from django.db.models import TextField
 from .models import SamplePaper
-from .serializers import SamplePaperUploadSerializer
-from .permissions import IsFacultyOrReadOnly
+from .serializers import SamplePaperSerializer
+from .permissions import IsHODOrReadOnly
 
 
-class FileUploadViewSet(viewsets.ModelViewSet):
+class SamplePaperViewSet(viewsets.ModelViewSet):
 
     """
     API endpoint for uploading sample papers.
     """
 
     queryset = SamplePaper.objects.all()
-    serializer_class = SamplePaperUploadSerializer
+    serializer_class = SamplePaperSerializer
     parser_classes = [MultiPartParser]
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsFacultyOrReadOnly]
+    permission_classes = [IsHODOrReadOnly]
     pagination_class = PageNumberPagination
 
     def get_queryset(self):
@@ -37,10 +37,8 @@ class FileUploadViewSet(viewsets.ModelViewSet):
         if query:
 
             title_similarity = TrigramSimilarity(Cast('title', output_field=TextField()), query)
-            print(title_similarity)
-            queryset = SamplePaper.objects.annotate(similarity=title_similarity).order_by('-similarity')
-            for item in queryset:
-                print(item.similarity)
+            queryset = SamplePaper.objects.annotate(similarity=title_similarity).filter(similarity__gt=0.3).order_by('-similarity')
+            
         else:
             queryset = super().get_queryset()
 

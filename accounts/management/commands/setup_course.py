@@ -13,5 +13,5 @@ class Command(BaseCommand):
             Course.objects.create(name=name ,course_code=course_code)
 
             self.stdout.write(
-                        self.style.SUCCESS(f"Created Branch: {name}")
+                        self.style.SUCCESS(f"Created Course: {name}")
                     )

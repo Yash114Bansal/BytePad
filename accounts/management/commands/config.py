@@ -40,39 +40,39 @@ courses = [
 
             {
                 "Course Name": "Mathematics 2",
-                "Course Code": "BAS103",
+                "Course Code": "BAS203",
             },
             {
                 "Course Name": "Engineering Chemistry",
-                "Course Code": "BAS102",
+                "Course Code": "BAS202",
             },
             {
                 "Course Name": "Soft Skills",
-                "Course Code": "BAS105",
+                "Course Code": "BAS205",
             },
             {
                 "Course Name": "Fundamentals of Electronics Engineering",
-                "Course Code": "BEC101",
+                "Course Code": "BEC201",
             },
             {
                 "Course Name": "Fundamentals of Mechanical Engineering",
-                "Course Code": "BME101",
+                "Course Code": "BME201",
             },
             {
                 "Course Name": "Workshop Practice Lab",
-                "Course Code": "BWS151",
+                "Course Code": "BWS251",
             },
             {
                 "Course Name": "English Language Lab",
-                "Course Code": "BAS155",
+                "Course Code": "BAS255",
             },
             {
                 "Course Name": "Basic Electronics Engineering Lab",
-                "Course Code": "BEC151",
+                "Course Code": "BEC251",
             },
             {
                 "Course Name": "Engineering Chemistry Lab",
-                "Course Code": "BAS152",
+                "Course Code": "BAS252",
             },
             {
                 "Course Name": "Universal Human Value and Professional Ethics",
