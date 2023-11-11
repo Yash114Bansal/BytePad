@@ -4,6 +4,7 @@ import cloudinary
 import cloudinary.api
 import cloudinary.uploader
 from pathlib import Path
+from datetime import timedelta
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -100,6 +101,9 @@ REST_FRAMEWORK = {
 
 SIMPLE_JWT = {
     "USER_ID_FIELD": "email",
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=30),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=30),
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=30),
 }
 
 SWAGGER_SETTINGS = {

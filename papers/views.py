@@ -12,7 +12,16 @@ from .serializers import SamplePaperSerializer,SolutionSerializer
 
 class SamplePaperViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for uploading sample papers.
+    API endpoint for sample papers .
+
+    Use the following query parameters for filtering (in GET):
+    - `search`: Filter papers based on the provided search query.
+    
+    - `year`: Filter papers based on year.
+    
+    - `semester`: Filter papers based on semester.
+    
+    - `course_code`: Filter papers based on course.
     """
 
     queryset = SamplePaper.objects.all()
@@ -51,14 +60,29 @@ class SamplePaperViewSet(viewsets.ModelViewSet):
         return queryset
 
 class SolutionViewSets(viewsets.ModelViewSet):
-
     """
-    API endpoint for uploading sample papers solutions.
-    """
+    API endpoint for  sample papers solutions.
 
+    Use the following query parameters for filtering:
+    - `paper_id`: Filter solutions based on the provided paper ID.
+    """
     queryset = SamplePaperSolution.objects.all()
     serializer_class = SolutionSerializer
     parser_classes = [MultiPartParser]
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsFacultyOrReadOnly]
     pagination_class = PageNumberPagination
+
+    def get_queryset(self):
+        """
+        Filtering Results
+        """
+
+        paper_id = self.request.query_params.get('paper_id')
+
+        if paper_id:
+            queryset = SamplePaperSolution.objects.filter(paper_id=paper_id)
+        else:
+            queryset = super().get_queryset()
+
+        return queryset
