@@ -3,11 +3,12 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from accounts.models import Batch, UserProfile, StudentModel, FacultyModel
-from accounts.permissions import IsFaculty
+from accounts.models import Batch, UserProfile, StudentModel, FacultyModel, Semester, Course, Branch
+from accounts.permissions import IsFaculty,IsAdminOrReadOnly
 from accounts.serializers import UserSerializer, StudentSerializer, FacultySerializer
-from .serializers import BatchDetailSerializer, StudentSerializer
+from .serializers import BatchDetailSerializer, StudentSerializer,  CourseSerializer,SemeterSerializer,BranchSerializer
 
 class BatchDetailView(APIView):
 
@@ -101,3 +102,21 @@ class UserDetailsView(APIView):
                 {"message": "Student data not found"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+class SemesterViewSet(ModelViewSet):
+    queryset = Semester.objects.all()
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminOrReadOnly]
+    serializer_class = SemeterSerializer
+
+class BranchViewSet(ModelViewSet):
+    queryset = Branch.objects.all()
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminOrReadOnly]
+    serializer_class = BranchSerializer
+
+class CourseViewSet(ModelViewSet):
+    queryset = Course.objects.all()
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminOrReadOnly]
+    serializer_class = CourseSerializer

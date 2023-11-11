@@ -5,9 +5,10 @@ from rest_framework.pagination import PageNumberPagination
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models.functions import Cast
 from django.db.models import TextField
-from .models import SamplePaper
-from .serializers import SamplePaperSerializer
-from accounts.permissions import IsHODOrReadOnly
+from accounts.permissions import IsHODOrReadOnly,IsFacultyOrReadOnly
+
+from .models import SamplePaper,SamplePaperSolution
+from .serializers import SamplePaperSerializer,SolutionSerializer
 
 class SamplePaperViewSet(viewsets.ModelViewSet):
     """
@@ -48,3 +49,16 @@ class SamplePaperViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(courses__course_code=course_code)
 
         return queryset
+
+class SolutionViewSets(viewsets.ModelViewSet):
+
+    """
+    API endpoint for uploading sample papers solutions.
+    """
+
+    queryset = SamplePaperSolution.objects.all()
+    serializer_class = SolutionSerializer
+    parser_classes = [MultiPartParser]
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsFacultyOrReadOnly]
+    pagination_class = PageNumberPagination

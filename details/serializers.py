@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from accounts.models import Batch,StudentModel
+from accounts.models import Batch, StudentModel, Semester, Branch, Course
 
 
 class BatchDetailSerializer(serializers.ModelSerializer):
@@ -15,3 +15,23 @@ class StudentSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentModel
         fields = ['user_name', 'roll_number']
+
+
+class BranchSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Branch
+        fields = "__all__"
+
+
+class SemeterSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Semester
+        fields = "__all__"
+
+class CourseSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Course
+        fields = "__all__"
