@@ -11,5 +11,5 @@ class SolutionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SamplePaperSolution
-        fields = "__all__"
+        fields = ['id','paper', 'file',]
 

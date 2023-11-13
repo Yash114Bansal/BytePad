@@ -59,6 +59,7 @@ class SamplePaperViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+
 class SolutionViewSets(viewsets.ModelViewSet):
     """
     API endpoint for  sample papers solutions.
@@ -74,14 +75,16 @@ class SolutionViewSets(viewsets.ModelViewSet):
     pagination_class = PageNumberPagination
 
     def get_queryset(self):
+
         """
         Filtering Results
         """
-
+        
+        print("Helllo")
         paper_id = self.request.query_params.get('paper_id')
-
+    
         if paper_id:
-            queryset = SamplePaperSolution.objects.filter(paper_id=paper_id)
+            queryset = SamplePaperSolution.objects.filter(paper=paper_id)
         else:
             queryset = super().get_queryset()
 
