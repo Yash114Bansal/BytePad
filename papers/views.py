@@ -2,13 +2,14 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework import viewsets
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.mixins import CreateModelMixin, RetrieveModelMixin, DestroyModelMixin, ListModelMixin
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models.functions import Cast
 from django.db.models import TextField
 from accounts.permissions import IsHODOrReadOnly,IsFacultyOrReadOnly
 
-from .models import SamplePaper,SamplePaperSolution
-from .serializers import SamplePaperSerializer,SolutionSerializer
+from .models import SamplePaper,SamplePaperSolution, MyCollections
+from .serializers import SamplePaperSerializer,SolutionSerializer, MyCollectionsSerailizer
 
 class SamplePaperViewSet(viewsets.ModelViewSet):
     """
@@ -80,7 +81,6 @@ class SolutionViewSets(viewsets.ModelViewSet):
         Filtering Results
         """
         
-        print("Helllo")
         paper_id = self.request.query_params.get('paper_id')
     
         if paper_id:
@@ -89,3 +89,22 @@ class SolutionViewSets(viewsets.ModelViewSet):
             queryset = super().get_queryset()
 
         return queryset
+    
+class MyCollectionsViewSet(CreateModelMixin, ListModelMixin, RetrieveModelMixin, DestroyModelMixin, viewsets.GenericViewSet):
+
+    """
+    API endpoint for  My Collections.
+
+    """
+
+    queryset = MyCollections.objects.all()
+    serializer_class = MyCollectionsSerailizer
+    authentication_classes = [JWTAuthentication]
+    pagination_class = PageNumberPagination
+
+    def get_queryset(self):
+        queryset = MyCollections.objects.filter(user=self.request.user)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

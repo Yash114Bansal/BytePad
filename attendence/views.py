@@ -11,6 +11,8 @@ from .serializers import (
     FacultyBatchAttendanceSerializer,
     StudentAttendanceResponseSerializer,
     AttendanceUpdateSerializer,
+    FacultyAttendanceSerializer
+    
 )
 
 
@@ -25,9 +27,10 @@ class AttendenceSheetCreateView(GenericAPIView):
             data=request.data, context={"request": request}
         )
         if serializer.is_valid():
-            serializer.save()
+            attendance_records = serializer.save()
+
             return Response(
-                {"message": "successfully created attendance sheet"},
+                FacultyAttendanceSerializer(attendance_records,many=True).data,
                 status=status.HTTP_201_CREATED,
             )
 

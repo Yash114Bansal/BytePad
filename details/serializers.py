@@ -11,10 +11,11 @@ class BatchDetailSerializer(serializers.ModelSerializer):
 class StudentSerializer(serializers.ModelSerializer):
     
     user_name = serializers.CharField(source='user.name', read_only=True)
+    profile_pic = serializers.FileField(source="user.profile_picture")
 
     class Meta:
         model = StudentModel
-        fields = ['user_name', 'roll_number']
+        fields = ['user_name', 'roll_number','profile_pic']
 
 
 class BranchSerializer(serializers.ModelSerializer):

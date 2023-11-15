@@ -51,7 +51,7 @@ class AttendanceSheetSerializer(serializers.Serializer):
         )
         attendance_sheet.attendance_records.set(created_attendance_records)
 
-        return attendance_sheet
+        return attendance_records
 
 
 class AttendanceUpdateSerializer(serializers.ModelSerializer):
