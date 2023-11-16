@@ -2,6 +2,10 @@ from rest_framework import status
 from rest_framework.generics import GenericAPIView, ListAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.db.models import Sum
+from django.db.models import Count
+from django.db.models import Count, Case, When, F
+from django.db.models.functions import TruncDate
 from accounts.models import Batch, StudentModel
 from accounts.permissions import IsFaculty, IsStudent
 
@@ -11,6 +15,7 @@ from .serializers import (
     FacultyBatchAttendanceSerializer,
     StudentAttendanceResponseSerializer,
     AttendanceUpdateSerializer,
+    FacultyAttendanceSerializer
 )
 
 
@@ -25,9 +30,10 @@ class AttendenceSheetCreateView(GenericAPIView):
             data=request.data, context={"request": request}
         )
         if serializer.is_valid():
-            serializer.save()
+            attendance_records = serializer.save()
+
             return Response(
-                {"message": "successfully created attendance sheet"},
+                FacultyAttendanceSerializer(attendance_records,many=True).data,
                 status=status.HTTP_201_CREATED,
             )
 
@@ -103,4 +109,21 @@ class StudentAttendanceView(GenericAPIView):
             attendance_sheets, context={"user": user}, many=True
         )
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        student_attendance_sheets = Attendance.objects.filter(student=student,attendancesheet__in=attendance_sheets)
+        
+        attendance_counts = student_attendance_sheets.aggregate(
+            total_count=Count('id'),
+            present_count=Count(Case(When(present=True, then=F('id')))),
+        )
+
+        absent_count = attendance_counts['total_count'] - attendance_counts['present_count']
+
+
+        return Response({
+            "attendance_records": serializer.data,
+            "present": attendance_counts['present_count'],
+            "absent" : absent_count,
+            "total_classes": attendance_counts['total_count'],
+            "total_attendance": attendance_counts['present_count']/attendance_counts['total_count']*100 ,
+            
+        }, status=status.HTTP_200_OK)

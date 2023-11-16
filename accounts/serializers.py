@@ -29,7 +29,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-class StudentSerializer(serializers.ModelSerializer):
+class StudentDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentModel
         fields = [

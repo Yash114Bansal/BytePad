@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from accounts.permissions import IsFaculty, IsAdminOrReadOnly
-from accounts.serializers import UserSerializer, StudentSerializer, FacultySerializer
+from accounts.serializers import UserSerializer, StudentDetailSerializer, FacultySerializer
 from accounts.models import (
     Batch,
     UserProfile,
@@ -103,9 +103,9 @@ class UserDetailsView(APIView):
             # If The User Is A Student, Include Student Details
             if user.is_student:
                 student = StudentModel.objects.get(user=user.email)
-                student_serializer = StudentSerializer(student)
+                student_serializer = StudentDetailSerializer(student)
                 additional_data = student_serializer.data
-
+                additional_data.pop("user",None)
             # Merge The Additional Data Into The User Data
             response_data = {**serializer.data, **additional_data}
 
