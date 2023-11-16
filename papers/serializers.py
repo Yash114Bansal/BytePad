@@ -17,5 +17,5 @@ class MyCollectionsSerailizer(serializers.ModelSerializer):
 
     class Meta:
         model = MyCollections
-        fields = ['paper']
+        fields = ['id','paper']
 
