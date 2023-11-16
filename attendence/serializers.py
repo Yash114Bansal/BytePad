@@ -94,10 +94,11 @@ class StudentAttendanceResponseSerializer(serializers.Serializer):
         user = self.context.get("user")
 
         if user and user.is_student:
+            student_id = user.studentmodel_set.first().id
             student_records = [
                 record
                 for record in representation["attendance_records"]
-                if record["student"] == user.studentmodel_set.first().id
+                if record["student"] == student_id
             ]
             for record in student_records:
                 record.pop("student", None)
