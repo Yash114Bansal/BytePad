@@ -88,7 +88,7 @@ class UserDetailsView(APIView):
     def get(self, request, *args, **kwargs):
         try:
             # Getting User With Corresponding ID
-            user = UserProfile.objects.get(email=request.user.email)
+            user = request.user
 
             serializer = UserSerializer(user)
 
@@ -96,16 +96,60 @@ class UserDetailsView(APIView):
 
             # If The User Is A Faculty, Include Faculty Details
             if user.is_faculty:
-                faculty = FacultyModel.objects.get(user=user.email)
+                faculty = FacultyModel.objects.get(user=user)
                 faculty_serializer = FacultySerializer(faculty)
                 additional_data = faculty_serializer.data
 
             # If The User Is A Student, Include Student Details
             if user.is_student:
-                student = StudentModel.objects.get(user=user.email)
+                student = StudentModel.objects.get(user=user)
                 student_serializer = StudentDetailSerializer(student)
                 additional_data = student_serializer.data
                 additional_data.pop("user",None)
+
+            # Merge The Additional Data Into The User Data
+            response_data = {**serializer.data, **additional_data}
+
+            # Return The Response With A Status Code Of 200
+            return Response(response_data, status=status.HTTP_200_OK)
+
+        # If User Is Faculty And Faculty Details Does Not Exists
+        except FacultyModel.DoesNotExist:
+            return Response(
+                {"message": "Faculty data not found"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # If User Is Student And Student Details Does Not Exists
+        except StudentModel.DoesNotExist:
+            return Response(
+                {"message": "Student data not found"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+class BatchStudentDetailsView(APIView):
+
+    """
+    API Endpoint For Getting Details of User
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsFaculty]
+
+    def get(self, request, roll ,*args, **kwargs):
+        try:
+            # Getting User With Corresponding ID
+            student = StudentModel.objects.get(roll_number=roll)
+
+
+            serializer = UserSerializer(student.user)
+
+            additional_data = {}
+
+            student_serializer = StudentDetailSerializer(student)
+            additional_data = student_serializer.data
+            additional_data.pop("user",None)
+            
             # Merge The Additional Data Into The User Data
             response_data = {**serializer.data, **additional_data}
 
@@ -118,12 +162,6 @@ class UserDetailsView(APIView):
                 {"message": "User not found"}, status=status.HTTP_400_BAD_REQUEST
             )
 
-        # If User Is Faculty And Faculty Details Does Not Exists
-        except FacultyModel.DoesNotExist:
-            return Response(
-                {"message": "Faculty data not found"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
 
         # If User Is Student And Student Details Does Not Exists
         except StudentModel.DoesNotExist:

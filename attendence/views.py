@@ -2,10 +2,8 @@ from rest_framework import status
 from rest_framework.generics import GenericAPIView, ListAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from django.db.models import Sum
 from django.db.models import Count
 from django.db.models import Count, Case, When, F
-from django.db.models.functions import TruncDate
 from accounts.models import Batch, StudentModel
 from accounts.permissions import IsFaculty, IsStudent
 
