@@ -2,8 +2,12 @@ from rest_framework import status
 from rest_framework.generics import GenericAPIView, ListAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from datetime import date, timedelta
 from django.db.models import Count
 from django.db.models import Count, Case, When, F
+from django.utils import timezone
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from accounts.models import Batch, StudentModel
 from accounts.permissions import IsFaculty, IsStudent
 
@@ -94,6 +98,14 @@ class StudentAttendanceView(GenericAPIView):
     permission_classes = [IsStudent]
     serializer_class = StudentAttendanceResponseSerializer
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter('from_date', openapi.IN_QUERY, description="Start date of the date range (optional)", type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE, example="2023-01-01"),
+            openapi.Parameter('to_date', openapi.IN_QUERY, description="End date of the date range (optional)", type=openapi.TYPE_STRING, format=openapi.FORMAT_DATE, example="2023-01-31"),
+            openapi.Parameter('last_days', openapi.IN_QUERY, description="Number of days to look back (optional)", type=openapi.TYPE_INTEGER, example=7, default=7),
+            openapi.Parameter('last_month', openapi.IN_QUERY, description="Filter for the last month (optional)", type=openapi.TYPE_BOOLEAN, example=True, default=True),
+        ],
+    )
     def get(self, request):
         user = request.user
         student = StudentModel.objects.get(user=user)
@@ -102,6 +114,26 @@ class StudentAttendanceView(GenericAPIView):
         attendance_sheets = AttendanceSheet.objects.filter(
             assignment__batch__in=active_batches
         )
+        from_date_str = request.query_params.get('from_date')
+        to_date_str = request.query_params.get('to_date')
+        last_days = request.query_params.get('last_days')
+        last_month = request.query_params.get('last_month')
+
+        today = timezone.now().date()
+
+        if from_date_str and to_date_str:
+            from_date = date.fromisoformat(from_date_str)
+            to_date = date.fromisoformat(to_date_str)
+            attendance_sheets = attendance_sheets.filter(date__range=(from_date, to_date))
+        elif last_days:
+            last_days = int(last_days)
+            start_date = today - timedelta(days=last_days)
+            attendance_sheets = attendance_sheets.filter(date__range=(start_date, today))
+        elif last_month:
+            start_date = today - timedelta(days=today.day)
+            end_date = today.replace(day=1) - timedelta(days=1)
+            attendance_sheets = attendance_sheets.filter(date__range=(start_date, end_date))
+
 
         serializer = self.serializer_class(
             attendance_sheets, context={"user": user}, many=True
