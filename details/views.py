@@ -186,10 +186,8 @@ class StudentCoursesView(APIView):
         )
         serializer = StudentCoursesSerializer(courses,many=True)
 
-        if serializer.is_valid:
-            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SemesterViewSet(ModelViewSet):
 
