@@ -179,7 +179,11 @@ class StudentCoursesView(APIView):
 
     def get(self, request):
         user = request.user
+
+        # Getting Student Model
         student = StudentModel.objects.get(user=user)
+
+        # Filtering Courses For Student
         courses = BatchCourseFacultyAssignment.objects.filter(
             batch__is_active=True,
             batch__students__in=[student]
