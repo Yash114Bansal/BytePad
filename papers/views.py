@@ -2,26 +2,30 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework import viewsets
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.mixins import (
+    CreateModelMixin,
+    RetrieveModelMixin,
+    DestroyModelMixin,
+    ListModelMixin,
+)
 from django.contrib.postgres.search import TrigramSimilarity
 from django.db.models.functions import Cast
 from django.db.models import TextField
-from accounts.permissions import IsHODOrReadOnly,IsFacultyOrReadOnly
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
-from .models import SamplePaper,SamplePaperSolution
-from .serializers import SamplePaperSerializer,SolutionSerializer
+from accounts.permissions import IsHODOrReadOnly, IsFacultyOrReadOnly
+from .models import SamplePaper, SamplePaperSolution, MyCollections
+from .serializers import (
+    SamplePaperSerializer,
+    SolutionSerializer,
+    MyCollectionsSerailizer,
+)
+
 
 class SamplePaperViewSet(viewsets.ModelViewSet):
     """
     API endpoint for sample papers .
-
-    Use the following query parameters for filtering (in GET):
-    - `search`: Filter papers based on the provided search query.
-    
-    - `year`: Filter papers based on year.
-    
-    - `semester`: Filter papers based on semester.
-    
-    - `course_code`: Filter papers based on course.
     """
 
     queryset = SamplePaper.objects.all()
@@ -37,14 +41,20 @@ class SamplePaperViewSet(viewsets.ModelViewSet):
         Filtering Results
         """
 
-        query = self.request.query_params.get('search')
-        year = self.request.query_params.get('year')
-        semester = self.request.query_params.get('semester')
-        course_code = self.request.query_params.get('course_code')
+        query = self.request.query_params.get("search")
+        year = self.request.query_params.get("year")
+        semester = self.request.query_params.get("semester")
+        course_code = self.request.query_params.get("course_code")
 
         if query:
-            title_similarity = TrigramSimilarity(Cast('title', output_field=TextField()), query)
-            queryset = SamplePaper.objects.annotate(similarity=title_similarity).filter(similarity__gt=self.SIMILARITY_THRESHOLD).order_by('-similarity')
+            title_similarity = TrigramSimilarity(
+                Cast("title", output_field=TextField()), query
+            )
+            queryset = (
+                SamplePaper.objects.annotate(similarity=title_similarity)
+                .filter(similarity__gt=self.SIMILARITY_THRESHOLD)
+                .order_by("-similarity")
+            )
         else:
             queryset = super().get_queryset()
 
@@ -59,13 +69,43 @@ class SamplePaperViewSet(viewsets.ModelViewSet):
 
         return queryset
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "search",
+                openapi.IN_QUERY,
+                description="Filter papers based on the provided search query",
+                type=openapi.TYPE_STRING,
+            ),
+            openapi.Parameter(
+                "year",
+                openapi.IN_QUERY,
+                description="Filter papers based on year",
+                type=openapi.TYPE_INTEGER,
+            ),
+            openapi.Parameter(
+                "semester",
+                openapi.IN_QUERY,
+                description="Filter papers based on semester",
+                type=openapi.TYPE_INTEGER,
+            ),
+            openapi.Parameter(
+                "course_code",
+                openapi.IN_QUERY,
+                description="Filter papers based on course code",
+                type=openapi.TYPE_STRING,
+            ),
+        ],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+
 class SolutionViewSets(viewsets.ModelViewSet):
     """
     API endpoint for  sample papers solutions.
-
-    Use the following query parameters for filtering:
-    - `paper_id`: Filter solutions based on the provided paper ID.
     """
+
     queryset = SamplePaperSolution.objects.all()
     serializer_class = SolutionSerializer
     parser_classes = [MultiPartParser]
@@ -73,16 +113,56 @@ class SolutionViewSets(viewsets.ModelViewSet):
     permission_classes = [IsFacultyOrReadOnly]
     pagination_class = PageNumberPagination
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "paper_id",
+                openapi.IN_QUERY,
+                description="Filter solutions based on the provided paper ID",
+                type=openapi.TYPE_INTEGER,
+            ),
+        ],
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
     def get_queryset(self):
+
         """
         Filtering Results
         """
 
-        paper_id = self.request.query_params.get('paper_id')
+        paper_id = self.request.query_params.get("paper_id")
 
         if paper_id:
-            queryset = SamplePaperSolution.objects.filter(paper_id=paper_id)
+            queryset = SamplePaperSolution.objects.filter(paper=paper_id)
         else:
             queryset = super().get_queryset()
 
         return queryset
+
+
+class MyCollectionsViewSet(
+    CreateModelMixin,
+    ListModelMixin,
+    RetrieveModelMixin,
+    DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
+
+    """
+    API endpoint for  My Collections.
+
+    """
+
+    queryset = MyCollections.objects.all()
+    serializer_class = MyCollectionsSerailizer
+    authentication_classes = [JWTAuthentication]
+    pagination_class = PageNumberPagination
+
+    def get_queryset(self):
+        queryset = MyCollections.objects.filter(user=self.request.user)
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)

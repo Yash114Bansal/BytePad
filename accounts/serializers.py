@@ -12,6 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = [
             "email",
             "name",
+            'profile_picture',
             "is_department_head",
             "is_faculty",
             "is_student",
@@ -29,7 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
 
-class StudentSerializer(serializers.ModelSerializer):
+class StudentDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentModel
         fields = [

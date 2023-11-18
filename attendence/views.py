@@ -2,6 +2,11 @@ from rest_framework import status
 from rest_framework.generics import GenericAPIView, ListAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from datetime import date, timedelta
+from django.db.models import Count, Case, When, F
+from django.utils import timezone
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 from accounts.models import Batch, StudentModel
 from accounts.permissions import IsFaculty, IsStudent
 
@@ -11,10 +16,15 @@ from .serializers import (
     FacultyBatchAttendanceSerializer,
     StudentAttendanceResponseSerializer,
     AttendanceUpdateSerializer,
+    FacultyAttendanceSerializer,
 )
 
 
-class AttendenceSheetCreateView(GenericAPIView):
+class AttendanceSheetCreateView(GenericAPIView):
+    """
+    Create Bulk Attandance Record Of All Students of Batch.
+    """
+
     queryset = AttendanceSheet.objects.all()
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsFaculty]
@@ -25,16 +35,22 @@ class AttendenceSheetCreateView(GenericAPIView):
             data=request.data, context={"request": request}
         )
         if serializer.is_valid():
-            serializer.save()
+            attendance_records = serializer.save()
+
             return Response(
-                {"message": "successfully created attendance sheet"},
+                FacultyAttendanceSerializer(attendance_records, many=True).data,
                 status=status.HTTP_201_CREATED,
             )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class AttendenceSheetDeleteView(GenericAPIView):
+class AttendanceSheetDeleteView(GenericAPIView):
+
+    """
+    API Endpoint To Delete Whole Attendance Sheet.
+    """
+
     queryset = AttendanceSheet.objects.all()
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsFaculty]
@@ -56,6 +72,11 @@ class AttendenceSheetDeleteView(GenericAPIView):
 
 
 class FacultyBatchAttendanceView(ListAPIView):
+    """
+    API Endpoint For Faculty To View Attendance Of A Batch.
+    Also Include Date Filters
+    """
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsFaculty]
     serializer_class = FacultyBatchAttendanceSerializer
@@ -69,6 +90,33 @@ class FacultyBatchAttendanceView(ListAPIView):
         try:
             batch = Batch.objects.get(pk=batch_id)
             attendance_sheets = AttendanceSheet.objects.filter(assignment__batch=batch)
+
+            from_date_str = request.query_params.get("from_date")
+            to_date_str = request.query_params.get("to_date")
+            last_days = request.query_params.get("last_days")
+            last_month = request.query_params.get("last_month")
+
+            today = timezone.now().date()
+
+            if from_date_str and to_date_str:
+                from_date = date.fromisoformat(from_date_str)
+                to_date = date.fromisoformat(to_date_str)
+                attendance_sheets = attendance_sheets.filter(
+                    date__range=(from_date, to_date)
+                )
+            elif last_days:
+                last_days = int(last_days)
+                start_date = today - timedelta(days=last_days)
+                attendance_sheets = attendance_sheets.filter(
+                    date__range=(start_date, today)
+                )
+            elif last_month:
+                start_date = today - timedelta(days=today.day)
+                end_date = today.replace(day=1) - timedelta(days=1)
+                attendance_sheets = attendance_sheets.filter(
+                    date__range=(start_date, end_date)
+                )
+
         except Batch.DoesNotExist:
             return Response(
                 {"message": "batch does not exists"}, status=status.HTTP_404_NOT_FOUND
@@ -79,6 +127,10 @@ class FacultyBatchAttendanceView(ListAPIView):
 
 
 class AttendanceUpdateView(UpdateAPIView):
+    """
+    API Endpoint To Update Attendance.
+    """
+
     queryset = Attendance.objects.all()
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsFaculty]
@@ -86,10 +138,50 @@ class AttendanceUpdateView(UpdateAPIView):
 
 
 class StudentAttendanceView(GenericAPIView):
+    """
+    API Endpoint For Student TO View Their Attendance
+    """
+
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsStudent]
     serializer_class = StudentAttendanceResponseSerializer
 
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "from_date",
+                openapi.IN_QUERY,
+                description="Start date of the date range (optional)",
+                type=openapi.TYPE_STRING,
+                format=openapi.FORMAT_DATE,
+                example="2023-01-01",
+            ),
+            openapi.Parameter(
+                "to_date",
+                openapi.IN_QUERY,
+                description="End date of the date range (optional)",
+                type=openapi.TYPE_STRING,
+                format=openapi.FORMAT_DATE,
+                example="2023-01-31",
+            ),
+            openapi.Parameter(
+                "last_days",
+                openapi.IN_QUERY,
+                description="Number of days to look back (optional)",
+                type=openapi.TYPE_INTEGER,
+                example=7,
+                default=7,
+            ),
+            openapi.Parameter(
+                "last_month",
+                openapi.IN_QUERY,
+                description="Filter for the last month (optional)",
+                type=openapi.TYPE_BOOLEAN,
+                example=True,
+                default=True,
+            ),
+        ],
+    )
     def get(self, request):
         user = request.user
         student = StudentModel.objects.get(user=user)
@@ -98,9 +190,58 @@ class StudentAttendanceView(GenericAPIView):
         attendance_sheets = AttendanceSheet.objects.filter(
             assignment__batch__in=active_batches
         )
+        from_date_str = request.query_params.get("from_date")
+        to_date_str = request.query_params.get("to_date")
+        last_days = request.query_params.get("last_days")
+        last_month = request.query_params.get("last_month")
+
+        today = timezone.now().date()
+
+        if from_date_str and to_date_str:
+            from_date = date.fromisoformat(from_date_str)
+            to_date = date.fromisoformat(to_date_str)
+            attendance_sheets = attendance_sheets.filter(
+                date__range=(from_date, to_date)
+            )
+        elif last_days:
+            last_days = int(last_days)
+            start_date = today - timedelta(days=last_days)
+            attendance_sheets = attendance_sheets.filter(
+                date__range=(start_date, today)
+            )
+        elif last_month:
+            start_date = today - timedelta(days=today.day)
+            end_date = today.replace(day=1) - timedelta(days=1)
+            attendance_sheets = attendance_sheets.filter(
+                date__range=(start_date, end_date)
+            )
 
         serializer = self.serializer_class(
             attendance_sheets, context={"user": user}, many=True
         )
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        student_attendance_sheets = Attendance.objects.filter(
+            student=student, attendancesheet__in=attendance_sheets
+        )
+
+        attendance_counts = student_attendance_sheets.aggregate(
+            total_count=Count("id"),
+            present_count=Count(Case(When(present=True, then=F("id")))),
+        )
+
+        absent_count = (
+            attendance_counts["total_count"] - attendance_counts["present_count"]
+        )
+
+        return Response(
+            {
+                "attendance_records": serializer.data,
+                "present": attendance_counts["present_count"],
+                "absent": absent_count,
+                "total_classes": attendance_counts["total_count"],
+                "total_attendance": attendance_counts["present_count"]
+                / attendance_counts["total_count"]
+                * 100,
+            },
+            status=status.HTTP_200_OK,
+        )

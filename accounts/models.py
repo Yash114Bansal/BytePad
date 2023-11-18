@@ -12,7 +12,7 @@ class UserProfile(AbstractUser):
     name = models.CharField(max_length=200, null=True)
 
     profile_picture = models.ImageField(
-        upload_to="profile_pics/", default="default.png"
+        upload_to="profile_pics/", default=None
     )
 
     is_department_head = models.BooleanField(default=False)
