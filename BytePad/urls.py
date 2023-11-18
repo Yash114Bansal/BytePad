@@ -28,6 +28,7 @@ urlpatterns = [
     path("papers/", include("papers.urls")),
     path("details/", include("details.urls")),
     path("attendence/",include("attendence.urls")),
+    path("announcements/",include("announcement.urls")),
 
     # Swagger documentation URLs
     path("swagger<format>/", schema_view.without_ui(cache_timeout=0), name="schema-json"),
