@@ -16,6 +16,10 @@ from .serializers import (
 
 
 class AnnouncementCreateView(generics.CreateAPIView):
+    """
+    API Endpoint For HODs To Create Announcements
+    """
+
     queryset = Announcement.objects.all()
     parser_classes = [MultiPartParser]
     authentication_classes = [JWTAuthentication]
@@ -28,6 +32,10 @@ class AnnouncementCreateView(generics.CreateAPIView):
 
 
 class AnnouncementListView(generics.ListAPIView):
+    """
+    API Endpoint TO View Announcements By HODs
+    """
+
     queryset = Announcement.objects.all()
     serializer_class = AnnouncementListSerializer
     parser_classes = [MultiPartParser]
@@ -35,17 +43,24 @@ class AnnouncementListView(generics.ListAPIView):
 
     def get_queryset(self):
 
+        # Filtering And Ordering Announcements By Time
         announcements = Announcement.objects.filter(time__gte=timezone.now()).order_by(
             "time"
         )
 
         if self.request.user.is_student:
+
+            # Removing Faculty-Only Announcements
             announcements = Announcement.objects.filter(faculty_only=False)
 
         return announcements
 
 
 class BatchSpecificAnnouncementCreateView(generics.CreateAPIView):
+    """
+    API Endpoint For Faculty To Create Announcement For Their Batch
+    """
+
     queryset = BatchSpecificAnnouncement.objects.all()
     parser_classes = [MultiPartParser]
     authentication_classes = [JWTAuthentication]
@@ -55,6 +70,7 @@ class BatchSpecificAnnouncementCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         batch_id = serializer.validated_data["Batch"]
         try:
+            # Checking If Faculty Gave ID of His Own Batch
             BatchCourseFacultyAssignment.objects.get(
                 batch=batch_id, faculty=self.request.user.facultymodel_set.first()
             )
@@ -65,6 +81,10 @@ class BatchSpecificAnnouncementCreateView(generics.CreateAPIView):
 
 
 class BatchSpecificAnnouncementListView(generics.ListAPIView):
+    """
+    API Endpoint For Student To View Announcement of Faculties
+    """
+
     queryset = BatchSpecificAnnouncement.objects.all()
     serializer_class = BatchSpecificAnnouncementListSerializer
     parser_classes = [MultiPartParser]
@@ -75,6 +95,7 @@ class BatchSpecificAnnouncementListView(generics.ListAPIView):
 
         student = StudentModel.objects.get(user=self.request.user)
 
+        # Filtering And Ordering Announcements By Time
         announcements = BatchSpecificAnnouncement.objects.filter(
             time__gte=timezone.now(), Batch__students__in=[student]
         ).order_by("time")
