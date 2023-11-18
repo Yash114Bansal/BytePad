@@ -22,7 +22,16 @@ from .serializers import (
 
 class AttendanceSheetCreateView(GenericAPIView):
     """
+    Create Attendance Sheet For A Lecture (Faculty).
+
     Create Bulk Attandance Record Of All Students of Batch.
+
+    - `batchID` : ID Of Batch.
+
+    - `all_present` : Where To Mark Everyone Present Initially.
+
+    - `date` : Date Of Lecture
+
     """
 
     queryset = AttendanceSheet.objects.all()
@@ -48,6 +57,8 @@ class AttendanceSheetCreateView(GenericAPIView):
 class AttendanceSheetDeleteView(GenericAPIView):
 
     """
+    Delete Attendance Sheet (Faculty).
+
     API Endpoint To Delete Whole Attendance Sheet.
     """
 
@@ -73,8 +84,11 @@ class AttendanceSheetDeleteView(GenericAPIView):
 
 class FacultyBatchAttendanceView(ListAPIView):
     """
+    View Attendance (Faculty).
+
     API Endpoint For Faculty To View Attendance Of A Batch.
-    Also Include Date Filters
+    > Required:
+    - `batchID` : ID Of Batch.
     """
 
     authentication_classes = [JWTAuthentication]
@@ -128,7 +142,9 @@ class FacultyBatchAttendanceView(ListAPIView):
 
 class AttendanceUpdateView(UpdateAPIView):
     """
-    API Endpoint To Update Attendance.
+    Update Attendance (Faculty).
+    
+    API Endpoint For Faculty To Update Attendance.
     """
 
     queryset = Attendance.objects.all()
@@ -139,6 +155,8 @@ class AttendanceUpdateView(UpdateAPIView):
 
 class StudentAttendanceView(GenericAPIView):
     """
+    View Attendance (Students).
+
     API Endpoint For Student TO View Their Attendance
     """
 
@@ -170,7 +188,6 @@ class StudentAttendanceView(GenericAPIView):
                 description="Number of days to look back (optional)",
                 type=openapi.TYPE_INTEGER,
                 example=7,
-                default=7,
             ),
             openapi.Parameter(
                 "last_month",
@@ -178,7 +195,6 @@ class StudentAttendanceView(GenericAPIView):
                 description="Filter for the last month (optional)",
                 type=openapi.TYPE_BOOLEAN,
                 example=True,
-                default=True,
             ),
         ],
     )

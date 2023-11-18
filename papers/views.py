@@ -25,7 +25,9 @@ from .serializers import (
 
 class SamplePaperViewSet(viewsets.ModelViewSet):
     """
-    API endpoint for sample papers .
+    Get Sample Papers.
+
+    API Endpoint For Sample Papers Students, Faculty Can View, Only HODs Can Update.
     """
 
     queryset = SamplePaper.objects.all()
@@ -103,7 +105,9 @@ class SamplePaperViewSet(viewsets.ModelViewSet):
 
 class SolutionViewSets(viewsets.ModelViewSet):
     """
-    API endpoint for  sample papers solutions.
+    Get Solutions.
+
+    API Endpoint For Sample Paper Solutions. Students Can Read, Faculties Can Update.
     """
 
     queryset = SamplePaperSolution.objects.all()
@@ -151,8 +155,9 @@ class MyCollectionsViewSet(
 ):
 
     """
-    API endpoint for  My Collections.
+    Collections (Student / Faculty).
 
+    API endpoint for Collections.
     """
 
     queryset = MyCollections.objects.all()
