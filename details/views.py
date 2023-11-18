@@ -5,12 +5,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from accounts.permissions import IsFaculty, IsAdminOrReadOnly
+from accounts.permissions import IsFaculty, IsAdminOrReadOnly, IsStudent
 from accounts.serializers import UserSerializer, StudentDetailSerializer, FacultySerializer
 from accounts.models import (
     Batch,
     UserProfile,
     StudentModel,
+    BatchCourseFacultyAssignment,
     FacultyModel,
     Semester,
     Course,
@@ -22,6 +23,7 @@ from .serializers import (
     CourseSerializer,
     SemeterSerializer,
     BranchSerializer,
+    StudentCoursesSerializer,
 )
 
 
@@ -170,6 +172,27 @@ class BatchStudentDetailsView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+class StudentCoursesView(APIView):
+    """
+    API Endpoint For Students To See Their Courses
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsStudent]
+
+    def get(self, request):
+        user = request.user
+        student = StudentModel.objects.get(user=user)
+        courses = BatchCourseFacultyAssignment.objects.filter(
+            batch__is_active=True,
+            batch__students__in=[student]
+        )
+        serializer = StudentCoursesSerializer(courses,many=True)
+
+        if serializer.is_valid:
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SemesterViewSet(ModelViewSet):
 

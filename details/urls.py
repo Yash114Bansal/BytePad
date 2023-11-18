@@ -7,6 +7,7 @@ from .views import (
     CourseViewSet,
     BranchViewSet,
     BatchStudentDetailsView,
+    StudentCoursesView
 )
 from rest_framework.routers import DefaultRouter
 
@@ -20,5 +21,6 @@ urlpatterns = [
     path("batch/student/<int:pk>", StudentListView.as_view()),
     path("user/", UserDetailsView.as_view()),
     path("batch-student/<str:roll>", BatchStudentDetailsView.as_view()),
+    path("student/mycourses/",StudentCoursesView.as_view()),
     path("", include(router.urls)),
 ]
