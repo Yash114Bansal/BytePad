@@ -20,7 +20,9 @@ from secrets import token_hex as generateToken
 class SendMailView(GenericAPIView):
     
     """
-    Takes User Mail and send OTP to Verify it
+    Send OTP To Mail.
+
+    Takes User Mail and send OTP to Verify it.
     """
 
     serializer_class = ResetPasswordSerializer
@@ -75,7 +77,9 @@ class SendMailView(GenericAPIView):
 class VerifyOTPView(GenericAPIView):
 
     """
-    Takes User Mail and OTP And Verify Them
+    Verify OTP
+
+    Takes User Mail and OTP And Verify Them.
     """
 
     serializer_class = VerifyOTPSerializer
@@ -135,7 +139,9 @@ class VerifyOTPView(GenericAPIView):
 class UpdatePasswordView(GenericAPIView):
 
     """
-    Takes Verified Mail and New Password And Updates User Password
+    Change Password After Verifying Mail.
+
+    Takes Verified Mail and New Password And Updates User Password.
     """
 
     serializer_class = UpdatePasswordSerializer
