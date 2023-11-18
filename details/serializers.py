@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from accounts.models import Batch, StudentModel, Semester, Branch, Course
+from accounts.models import Batch, StudentModel, Semester, Branch, Course, BatchCourseFacultyAssignment
 
 
 class BatchDetailSerializer(serializers.ModelSerializer):
@@ -36,3 +36,13 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = "__all__"
+
+class StudentCoursesSerializer(serializers.ModelSerializer):
+    batch_name = serializers.CharField(source="batch.name")
+    course = serializers.CharField(source="course.name")
+    course_code = serializers.CharField(source="course.course_code")
+    faculty = serializers.CharField(source = "faculty.user.name")
+
+    class Meta:
+        model = BatchCourseFacultyAssignment
+        fields = ['batch_name', 'course','course_code',"faculty"]
