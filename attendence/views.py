@@ -3,7 +3,6 @@ from rest_framework.generics import GenericAPIView, ListAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from datetime import date, timedelta
-from django.db.models import Count
 from django.db.models import Count, Case, When, F
 from django.utils import timezone
 from drf_yasg.utils import swagger_auto_schema
