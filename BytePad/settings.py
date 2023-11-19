@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "details",
     "attendence",
     "announcement",
+    "timetable",
     "import_export",
     "drf_yasg",
 ]
