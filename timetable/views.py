@@ -91,7 +91,7 @@ class TimeTableView(APIView):
 
             faculty = FacultyModel.objects.get(user=user)
             
-            assignments = BatchCourseFacultyAssignment.objects.all(faculty=faculty)
+            assignments = BatchCourseFacultyAssignment.objects.filter(faculty=faculty)
             
             lectures = LectureModel.objects.filter(subject__in=assignments)
             
