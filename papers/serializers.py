@@ -14,8 +14,13 @@ class SolutionSerializer(serializers.ModelSerializer):
         fields = ['id','paper', 'file',]
 
 class MyCollectionsSerailizer(serializers.ModelSerializer):
+    
+    title = serializers.CharField(source="paper.title")
+    year = serializers.CharField(source="paper.year")
+    semester = serializers.CharField(source="paper.semester")
+    courses = serializers.StringRelatedField(many=True, source="paper.courses")
 
     class Meta:
         model = MyCollections
-        fields = ['id','paper']
+        fields = ['id','title','year','semester','courses','paper']
 
