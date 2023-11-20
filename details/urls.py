@@ -6,6 +6,7 @@ from .views import (
     SemesterViewSet,
     CourseViewSet,
     BranchViewSet,
+    SlotViewSets,
     BatchStudentDetailsView,
     StudentCoursesView
 )
@@ -15,6 +16,7 @@ router = DefaultRouter()
 router.register(r"semesters", SemesterViewSet, basename="semester")
 router.register(r"courses", CourseViewSet, basename="courses")
 router.register(r"branches", BranchViewSet, basename="branches")
+router.register(r"slots", SlotViewSets, basename="slots")
 
 urlpatterns = [
     path("batch/", BatchDetailView.as_view()),

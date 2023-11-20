@@ -1,17 +1,24 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.views import APIView 
+from rest_framework.pagination import PageNumberPagination
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from django.contrib.postgres.search import TrigramSimilarity
+from django.db.models.functions import Cast
+from django.db.models import TextField
+
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 from accounts.models import Batch, StudentModel, FacultyModel, BatchCourseFacultyAssignment
 from accounts.permissions import IsHOD
 from .models import LectureModel, TimeTableModel
-from .serializers import LectureCreateSerializer, StudentLectureViewSerializer, FacultyLectureViewSerializer
+from .serializers import LectureCreateSerializer, StudentLectureViewSerializer, FacultyLectureViewSerializer, AllTimeTablesSerializer,SubjectDetailsSerializer
 
 
-class LectureCreateView(generics.CreateAPIView, generics.UpdateAPIView):
+class LectureCreateView(generics.CreateAPIView):
     """
-    Create / Update Time Table (HOD only)
+    Create Time Table (HOD only)
 
     API Endpoint To Add Lectures Of Time Table
     """
@@ -44,6 +51,19 @@ class LectureCreateView(generics.CreateAPIView, generics.UpdateAPIView):
             serializer.data, status=status.HTTP_201_CREATED, headers=headers
         )
 
+
+class LectureUpdateView(generics.UpdateAPIView):
+    """
+    Update Time Table (HOD only)
+
+    API Endpoint To Add Lectures Of Time Table
+    """
+
+    queryset = LectureModel.objects.all()
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsHOD]
+    serializer_class = LectureCreateSerializer
+
     def update(self, request, *args, **kwargs):
         batch_id = kwargs.get("batch_id")
         lecture_id = kwargs.get("pk")
@@ -68,20 +88,36 @@ class LectureCreateView(generics.CreateAPIView, generics.UpdateAPIView):
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK, headers=headers)
 
+
 class TimeTableView(APIView):
+    """
+    Get Your TimeTable (Student / Faculty)
+
+    API Endpoint To Get Time Table
+    """
+
     authentication_classes = [JWTAuthentication]
 
+    @swagger_auto_schema(manual_parameters=[
+        openapi.Parameter('day', in_=openapi.IN_QUERY, type=openapi.TYPE_STRING, enum=['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'], description='Filter by day of the week')
+    ])
     def get(self, request):
 
         user = request.user
 
         if user.is_student:
-                
+            
             student = StudentModel.objects.get(user=user)
             batch=Batch.objects.filter(is_active=True, students=student).first()
             timetable = TimeTableModel.objects.get(batch=batch)
 
+
             lectures = timetable.lectures.all()
+
+            day = request.query_params.get("day")
+
+            if day:
+                lectures = lectures.filter(day=day)
 
             serializer = StudentLectureViewSerializer(lectures,many=True)
 
@@ -95,7 +131,61 @@ class TimeTableView(APIView):
             
             lectures = LectureModel.objects.filter(subject__in=assignments)
             
+            day = request.query_params.get("day")
+            
+            if day:
+                lectures = lectures.filter(day=day)
+
             serializer = FacultyLectureViewSerializer(lectures,many=True)
 
             return Response(serializer.data,status=status.HTTP_200_OK)
 
+class AllTimeTablesView(APIView):
+    """
+    Get All TimeTables (HOD only)
+
+    API Endpoint To Add Lectures Of Time Table
+    """
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsHOD]
+    pagination_class = PageNumberPagination
+
+    SIMILARITY_THRESHOLD = 0.1
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "batchName",
+                openapi.IN_QUERY,
+                description="Filter Time Tables On Basis Of Batches Name",
+                type=openapi.TYPE_STRING,
+            ),
+        ],
+    )
+    def get(self, request, *args, **kwargs):
+        queryset = TimeTableModel.objects.all()
+        query = self.request.query_params.get('batchName', None)
+
+        if query:
+            batch_name_similarity = TrigramSimilarity(
+                Cast("batch__name", output_field=TextField()), query
+            )
+            queryset = (
+                TimeTableModel.objects.annotate(similarity=batch_name_similarity)
+                .filter(similarity__gt=self.SIMILARITY_THRESHOLD)
+                .order_by("-similarity")
+            )
+
+        serializer = AllTimeTablesSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class SubjectDetailsView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsHOD]
+    def get(self, request, batchID):
+        assignments = BatchCourseFacultyAssignment.objects.filter(batch = batchID)
+        serializer = SubjectDetailsSerializer(assignments,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
