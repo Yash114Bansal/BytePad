@@ -17,6 +17,7 @@ from accounts.models import (
     Course,
     Branch,
 )
+from timetable.models import LectureNumberModel
 from .serializers import (
     BatchDetailSerializer,
     StudentSerializer,
@@ -24,6 +25,7 @@ from .serializers import (
     SemeterSerializer,
     BranchSerializer,
     StudentCoursesSerializer,
+    LectureNumberSerializer,
 )
 
 
@@ -249,3 +251,16 @@ class CourseViewSet(ModelViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAdminOrReadOnly]
     serializer_class = CourseSerializer
+
+class SlotViewSets(ModelViewSet):
+    """
+    Get List Of Time Table Slots (Student / Faculty).
+
+    API Endpoint For Getting Details Of Time Table Slots
+    (Only Admin Can Update)
+    """
+
+    queryset = LectureNumberModel.objects.all()
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminOrReadOnly]
+    serializer_class = LectureNumberSerializer
