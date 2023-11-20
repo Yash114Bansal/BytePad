@@ -16,4 +16,13 @@ class StudentLectureViewSerializer(serializers.ModelSerializer):
         model = LectureModel
         fields = ["start_time","end_time","day","teacher","course_name","course_code","room"]
 
-        
+class FacultyLectureViewSerializer(serializers.ModelSerializer):
+    start_time = serializers.CharField(source="slot_number.start_time")
+    end_time = serializers.CharField(source="slot_number.end_time")
+    course_name = serializers.CharField(source="subject.course.name")
+    course_code = serializers.CharField(source="subject.course.course_code")
+    batch_name = serializers.CharField(source="subject.batch.name")
+    class Meta:
+        model = LectureModel
+        fields = ["start_time","end_time","day","batch_name","course_name","course_code","room"]
+

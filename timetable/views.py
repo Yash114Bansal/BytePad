@@ -3,10 +3,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView 
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from accounts.models import Batch, StudentModel
+from accounts.models import Batch, StudentModel, FacultyModel, BatchCourseFacultyAssignment
 from accounts.permissions import IsHOD
 from .models import LectureModel, TimeTableModel
-from .serializers import LectureCreateSerializer, StudentLectureViewSerializer
+from .serializers import LectureCreateSerializer, StudentLectureViewSerializer, FacultyLectureViewSerializer
 
 
 class LectureCreateView(generics.CreateAPIView, generics.UpdateAPIView):
@@ -87,4 +87,15 @@ class TimeTableView(APIView):
 
             return Response(serializer.data,status=status.HTTP_200_OK)
 
-        return Response({})
+        if user.is_faculty:
+
+            faculty = FacultyModel.objects.get(user=user)
+            
+            assignments = BatchCourseFacultyAssignment.objects.all(faculty=faculty)
+            
+            lectures = LectureModel.objects.filter(subject__in=assignments)
+            
+            serializer = FacultyLectureViewSerializer(lectures,many=True)
+
+            return Response(serializer.data,status=status.HTTP_200_OK)
+
