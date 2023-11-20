@@ -13,7 +13,7 @@ from drf_yasg import openapi
 from accounts.models import Batch, StudentModel, FacultyModel, BatchCourseFacultyAssignment
 from accounts.permissions import IsHOD
 from .models import LectureModel, TimeTableModel
-from .serializers import LectureCreateSerializer, StudentLectureViewSerializer, FacultyLectureViewSerializer, AllTimeTablesSerializer,SubjectDetailsSerializer
+from .serializers import LectureCreateSerializer, StudentLectureViewSerializer, FacultyLectureViewSerializer, AllTimeTablesSerializer,SubjectDetailsSerializer, BatchDetailsSerializer
 
 
 class LectureCreateView(generics.CreateAPIView):
@@ -188,4 +188,37 @@ class SubjectDetailsView(APIView):
     def get(self, request, batchID):
         assignments = BatchCourseFacultyAssignment.objects.filter(batch = batchID)
         serializer = SubjectDetailsSerializer(assignments,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    
+class BatchDetailsView(APIView):
+
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsHOD]
+    SIMILARITY_THRESHOLD = 0.1
+
+    @swagger_auto_schema(
+        manual_parameters=[
+            openapi.Parameter(
+                "batchName",
+                openapi.IN_QUERY,
+                description="Filter Batches On Basis Of Name",
+                type=openapi.TYPE_STRING,
+            ),
+        ],
+    )
+
+    def get(self, request):
+        batches = Batch.objects.filter(is_active=True)
+        query = self.request.query_params.get('batchName', None)
+
+        if query:
+            batch_name_similarity = TrigramSimilarity(
+                Cast("name", output_field=TextField()), query
+            )
+            batches = (
+                Batch.objects.annotate(similarity=batch_name_similarity)
+                .filter(similarity__gt=self.SIMILARITY_THRESHOLD)
+                .order_by("-similarity")
+            )
+        serializer = BatchDetailsSerializer(batches,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)

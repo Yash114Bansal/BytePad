@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import LectureModel, TimeTableModel
-from accounts.models import BatchCourseFacultyAssignment
+from accounts.models import BatchCourseFacultyAssignment, Batch
 
 
 class LectureCreateSerializer(serializers.ModelSerializer):
@@ -58,3 +58,9 @@ class SubjectDetailsSerializer(serializers.ModelSerializer):
         model = BatchCourseFacultyAssignment
         fields = ["id","course_name","course_code","teacher"]
 
+
+class BatchDetailsSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Batch
+        fields = ["id","name"]
