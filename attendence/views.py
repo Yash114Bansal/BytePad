@@ -1,13 +1,14 @@
+from collections import defaultdict
 from rest_framework import status
 from rest_framework.generics import GenericAPIView, ListAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from datetime import date, timedelta
-from django.db.models import Count, Case, When, F
+from django.db.models import Count, Case, When, F, Sum, Value, IntegerField, Q
 from django.utils import timezone
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-from accounts.models import Batch, StudentModel
+from accounts.models import Batch, StudentModel, BatchCourseFacultyAssignment
 from accounts.permissions import IsFaculty, IsStudent
 
 from .models import Attendance, AttendanceSheet
@@ -22,7 +23,16 @@ from .serializers import (
 
 class AttendanceSheetCreateView(GenericAPIView):
     """
+    Create Attendance Sheet For A Lecture (Faculty).
+
     Create Bulk Attandance Record Of All Students of Batch.
+
+    - `batchID` : ID Of Batch.
+
+    - `all_present` : Where To Mark Everyone Present Initially.
+
+    - `date` : Date Of Lecture
+
     """
 
     queryset = AttendanceSheet.objects.all()
@@ -48,6 +58,8 @@ class AttendanceSheetCreateView(GenericAPIView):
 class AttendanceSheetDeleteView(GenericAPIView):
 
     """
+    Delete Attendance Sheet (Faculty).
+
     API Endpoint To Delete Whole Attendance Sheet.
     """
 
@@ -73,8 +85,11 @@ class AttendanceSheetDeleteView(GenericAPIView):
 
 class FacultyBatchAttendanceView(ListAPIView):
     """
+    View Attendance (Faculty).
+
     API Endpoint For Faculty To View Attendance Of A Batch.
-    Also Include Date Filters
+    > Required:
+    - `batchID` : ID Of Batch.
     """
 
     authentication_classes = [JWTAuthentication]
@@ -128,7 +143,9 @@ class FacultyBatchAttendanceView(ListAPIView):
 
 class AttendanceUpdateView(UpdateAPIView):
     """
-    API Endpoint To Update Attendance.
+    Update Attendance (Faculty).
+
+    API Endpoint For Faculty To Update Attendance.
     """
 
     queryset = Attendance.objects.all()
@@ -139,6 +156,8 @@ class AttendanceUpdateView(UpdateAPIView):
 
 class StudentAttendanceView(GenericAPIView):
     """
+    View Attendance (Students).
+
     API Endpoint For Student TO View Their Attendance
     """
 
@@ -170,7 +189,6 @@ class StudentAttendanceView(GenericAPIView):
                 description="Number of days to look back (optional)",
                 type=openapi.TYPE_INTEGER,
                 example=7,
-                default=7,
             ),
             openapi.Parameter(
                 "last_month",
@@ -178,7 +196,6 @@ class StudentAttendanceView(GenericAPIView):
                 description="Filter for the last month (optional)",
                 type=openapi.TYPE_BOOLEAN,
                 example=True,
-                default=True,
             ),
         ],
     )
@@ -233,6 +250,30 @@ class StudentAttendanceView(GenericAPIView):
             attendance_counts["total_count"] - attendance_counts["present_count"]
         )
 
+        course_counts = defaultdict(lambda: {"present": 0, "absent": 0})
+
+        # Iterate through the attendance records
+        for record in serializer.data:
+            course_name = record["course_name"]
+            present = record["attendance_records"][0]["present"]
+
+            # Update counts for present and absent
+            if present:
+                course_counts[course_name]["present"] += 1
+            else:
+                course_counts[course_name]["absent"] += 1
+
+        courses_attendance = [
+            {
+                "subject": course_name,
+                **counts,
+                "percent": (counts["present"])
+                * 100
+                / (counts["present"] + counts["absent"]),
+            }
+            for course_name, counts in course_counts.items()
+        ]
+
         return Response(
             {
                 "attendance_records": serializer.data,
@@ -242,6 +283,7 @@ class StudentAttendanceView(GenericAPIView):
                 "total_attendance": attendance_counts["present_count"]
                 / attendance_counts["total_count"]
                 * 100,
+                "course_wise": courses_attendance,
             },
             status=status.HTTP_200_OK,
         )

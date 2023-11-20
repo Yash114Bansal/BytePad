@@ -17,6 +17,7 @@ from accounts.models import (
     Course,
     Branch,
 )
+from timetable.models import LectureNumberModel
 from .serializers import (
     BatchDetailSerializer,
     StudentSerializer,
@@ -24,12 +25,15 @@ from .serializers import (
     SemeterSerializer,
     BranchSerializer,
     StudentCoursesSerializer,
+    LectureNumberSerializer,
 )
 
 
 class BatchDetailView(APIView):
 
     """
+    Get Details Of Batch (Faculty).
+
     API endpoint for Getting Batches Of Faculty
     """
 
@@ -56,7 +60,10 @@ class BatchDetailView(APIView):
 class StudentListView(APIView):
 
     """
-    API Endpoint To Get List Of Students in a Batch
+    Get List Of Students Of Batch (Faculty).
+
+    API Endpoint To Get List Of Students in a Batch.
+    
     *Requires Batch ID
     """
 
@@ -78,7 +85,9 @@ class StudentListView(APIView):
 class UserDetailsView(APIView):
 
     """
-    API Endpoint For Getting Details of User
+    Get Details(Student / Faculty).
+
+    API Endpoint For Getting Details of User.
     """
 
     authentication_classes = [JWTAuthentication]
@@ -129,7 +138,11 @@ class UserDetailsView(APIView):
 class BatchStudentDetailsView(APIView):
 
     """
-    API Endpoint For Getting Details of User
+    Get Details Of Student Of A Batch (Faculty).
+
+    API Endpoint For Getting Details Student Of A Batch.
+
+    *Requires Roll Number Of Student.
     """
 
     authentication_classes = [JWTAuthentication]
@@ -171,7 +184,9 @@ class BatchStudentDetailsView(APIView):
 
 class StudentCoursesView(APIView):
     """
-    API Endpoint For Students To See Their Courses
+    Get Courses (Student).
+
+    API Endpoint For Students To See Their Courses.
     """
 
     authentication_classes = [JWTAuthentication]
@@ -196,8 +211,10 @@ class StudentCoursesView(APIView):
 class SemesterViewSet(ModelViewSet):
 
     """
-    API Endpoint For Getting Details Of Semester
-    (Only Admin Can Update)
+    Get List Of Semesters (Student / Faculty).
+
+    API Endpoint For Getting Details Of Semester.
+    (Only Admin Can Update).
     """
 
     queryset = Semester.objects.all()
@@ -209,6 +226,8 @@ class SemesterViewSet(ModelViewSet):
 class BranchViewSet(ModelViewSet):
 
     """
+    Get List Of Branches And Their Details (Student / Faculty).
+
     API Endpoint For Getting Details Of Branches
     (Only Admin Can Update)
     """
@@ -222,6 +241,8 @@ class BranchViewSet(ModelViewSet):
 class CourseViewSet(ModelViewSet):
 
     """
+    Get List Of Courses And Their Details (Student / Faculty).
+
     API Endpoint For Getting Details Of Courses
     (Only Admin Can Update)
     """
@@ -230,3 +251,16 @@ class CourseViewSet(ModelViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAdminOrReadOnly]
     serializer_class = CourseSerializer
+
+class SlotViewSets(ModelViewSet):
+    """
+    Get List Of Time Table Slots (Student / Faculty).
+
+    API Endpoint For Getting Details Of Time Table Slots
+    (Only Admin Can Update)
+    """
+
+    queryset = LectureNumberModel.objects.all()
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAdminOrReadOnly]
+    serializer_class = LectureNumberSerializer

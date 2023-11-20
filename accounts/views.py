@@ -9,7 +9,9 @@ from .serializers import UserSerializer, StudentDetailSerializer, FacultySeriali
 class UserViewSet(ModelViewSet):
 
     """
-    User Profiles, Admin Access Only
+    Admin Access Only.
+
+    API Endpoints To Add/Update Users.
     """
 
     queryset = UserProfile.objects.all()
@@ -21,7 +23,9 @@ class UserViewSet(ModelViewSet):
 class StudentDetailViewSet(ModelViewSet):
 
     """
-    Student Profiles, Admin Access Only
+    Admin Access Only.
+
+    API Endpoints To Add/Update Student Profiles.
     """
 
     queryset = StudentModel.objects.all()
@@ -33,7 +37,9 @@ class StudentDetailViewSet(ModelViewSet):
 class FacultyDetailViewSet(ModelViewSet):
 
     """
-    Faculty, Admin Access Only
+    Admin Access Only.
+
+    API Endpoints To Add/Update Faculty Profiles.
     """
 
     queryset = FacultyModel.objects.all()

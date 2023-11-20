@@ -17,7 +17,9 @@ from .serializers import (
 
 class AnnouncementCreateView(generics.CreateAPIView):
     """
-    API Endpoint For HODs To Create Announcements
+    Create Announcements (HODs).
+
+    API Endpoint For HODs To Create Announcements.
     """
 
     queryset = Announcement.objects.all()
@@ -33,7 +35,9 @@ class AnnouncementCreateView(generics.CreateAPIView):
 
 class AnnouncementListView(generics.ListAPIView):
     """
-    API Endpoint TO View Announcements By HODs
+    View HOD Announcements.
+
+    API Endpoint TO View Announcements By HODs.
     """
 
     queryset = Announcement.objects.all()
@@ -58,7 +62,9 @@ class AnnouncementListView(generics.ListAPIView):
 
 class BatchSpecificAnnouncementCreateView(generics.CreateAPIView):
     """
-    API Endpoint For Faculty To Create Announcement For Their Batch
+    Create Batch Announcements (Faculties).
+
+    API Endpoint For Faculty To Create Announcement For Their Batch.
     """
 
     queryset = BatchSpecificAnnouncement.objects.all()
@@ -82,7 +88,9 @@ class BatchSpecificAnnouncementCreateView(generics.CreateAPIView):
 
 class BatchSpecificAnnouncementListView(generics.ListAPIView):
     """
-    API Endpoint For Student To View Announcement of Faculties
+    View Batch Announcements (Students).
+
+    API Endpoint For Student To View Announcement of Faculties.
     """
 
     queryset = BatchSpecificAnnouncement.objects.all()

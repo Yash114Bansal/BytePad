@@ -7,7 +7,7 @@ from accounts.models import (
     Course,
     BatchCourseFacultyAssignment,
 )
-
+from timetable.models import LectureNumberModel
 
 class BatchDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -52,3 +52,9 @@ class StudentCoursesSerializer(serializers.ModelSerializer):
     class Meta:
         model = BatchCourseFacultyAssignment
         fields = ["batch_name", "course", "course_code", "faculty"]
+
+class LectureNumberSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = LectureNumberModel
+        fields = "__all__"
