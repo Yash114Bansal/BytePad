@@ -17,6 +17,7 @@ from drf_yasg import openapi
 from accounts.permissions import IsHODOrReadOnly, IsFacultyOrReadOnly
 from .models import SamplePaper, SamplePaperSolution, MyCollections
 from .serializers import (
+    MyCollectionsGetSerailizer,
     SamplePaperSerializer,
     SolutionSerializer,
     MyCollectionsSerailizer,
@@ -164,6 +165,14 @@ class MyCollectionsViewSet(
     serializer_class = MyCollectionsSerailizer
     authentication_classes = [JWTAuthentication]
     pagination_class = PageNumberPagination
+
+    def get_serializer_class(self):
+            
+        if self.action == 'retrieve' or self.action == 'list':
+            return MyCollectionsGetSerailizer
+        
+        return MyCollectionsSerailizer
+
 
     def get_queryset(self):
         queryset = MyCollections.objects.filter(user=self.request.user)

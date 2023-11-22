@@ -14,6 +14,12 @@ class SolutionSerializer(serializers.ModelSerializer):
         fields = ['id','paper', 'file',]
 
 class MyCollectionsSerailizer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MyCollections
+        fields = ['id','paper']
+
+class MyCollectionsGetSerailizer(serializers.ModelSerializer):
     
     title = serializers.CharField(source="paper.title")
     year = serializers.CharField(source="paper.year")
