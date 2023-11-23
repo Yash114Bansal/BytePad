@@ -98,8 +98,7 @@ class LectureUpdateView(generics.UpdateAPIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_200_OK, headers=headers)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class LectureDeleteView(generics.DestroyAPIView):
