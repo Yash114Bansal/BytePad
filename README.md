@@ -2,27 +2,35 @@
 
 BytePad is a comprehensive student management app designed to streamline and enhance the academic experience for students, teachers, and Heads of Department (HOD). This app offers a range of functionalities to facilitate seamless communication, resource access, and organization. Whether you're a student, teacher, or HOD, BytePad has you covered. 🚀
 
+## Screenshot
+
+![Screenshot](docs/Auth.png)
+
 ## Features
 
-### 1. Attendance 📅
-
-Keep track of attendance effortlessly. Students can view their attendance records, while teachers can easily mark and manage attendance for their classes.
-
-### 2. Past Papers and Solutions 📚
+### 1. Past Papers and Solutions 📚
 
 Access a repository of past papers and their solutions to help students prepare for exams effectively. Teachers can contribute to the repository, ensuring a comprehensive collection of study materials.
 
-### 3. Assignments 📝
+![Screenshot](docs/PastPapers.png)
 
-Manage assignments in a centralized platform. Teachers can create assignments, while students can easily look up deadlines.
+### 2. Attendance 📅
 
-### 4. Timetable ⌚
+Keep track of attendance effortlessly. Students can view their attendance records, while teachers can easily mark and manage attendance for their classes.
+
+![Screenshot](docs/Attendance.png)
+
+### 3. Timetable ⌚
 
 Stay organized with a dynamic timetable that adapts to your schedule. Students and teachers can view their timetables, helping them plan their activities efficiently.
 
-### 5. Announcement 🔔
+![Screenshot](docs/TimeTable.png)
+
+### 4. Announcement 🔔
 
 Receive important announcements from teachers or HOD directly through the app. Stay informed about class updates, schedule changes, and other essential information.
+
+![Screenshot](docs/Notifications.png)
 
 ## User Roles
 
@@ -32,9 +40,10 @@ Receive important announcements from teachers or HOD directly through the app. S
 - Access past papers and solutions
 - View assignments
 - View and manage timetable
-- Engage in chat with peers
 - Get notified about events
 - Receive announcements
+
+![Screenshot](docs/Student.png)
 
 ### 2. Teachers 👩🏫👨🏫
 
@@ -43,15 +52,17 @@ Receive important announcements from teachers or HOD directly through the app. S
 - Create assignments
 - View and manage timetable
 
+![Screenshot](docs/Faculty.png)
+
 ### 3. Heads of Department (HOD) 👩💼👨💼
 
 - Monitor overall attendance trends
 - Oversee and contribute to the past papers repository
-- Coordinate assignment distribution and assessment
 - View and manage departmental timetable
-- Facilitate communication within the department
 - Broadcast important announcements to the department
 - Create timetables
+
+![Screenshot](docs/HOD.png)
 
 ## Installation
 
