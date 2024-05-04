@@ -72,7 +72,6 @@ To run Bytepad locally, follow these steps:
 
 4. Set up the database: `python manage.py migrate`
 5. Run the development server: `python manage.py runserver`
-6. Open a new terminal and start the Celery worker: `celery -A vroomvroom worker -l info`
 
 
 ## Usage
