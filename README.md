@@ -49,7 +49,7 @@ Receive important announcements from teachers or HOD directly through the app. S
 
 - Mark and manage attendance
 - Contribute to the past papers repository
-- Create assignments
+- Upload solutions of past papers
 - View and manage timetable
 
 ![Screenshot](docs/Faculty.png)
@@ -63,6 +63,10 @@ Receive important announcements from teachers or HOD directly through the app. S
 - Create timetables
 
 ![Screenshot](docs/HOD.png)
+
+## Frontend
+
+The frontend for this application is developed by Lakshya Goel ([lakshya1goel](https://github.com/lakshya1goel)). You can find the frontend repository at [BytePad](https://github.com/lakshya1goel/BytePad/).
 
 ## Installation
 
